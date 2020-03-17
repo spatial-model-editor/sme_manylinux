@@ -1,9 +1,9 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-02-28-d5cc00d as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2020-03-07-1825e8f as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
-ARG NPROCS=6
+ARG NPROCS=2
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
 
@@ -11,21 +11,9 @@ RUN yum install -q -y \
     subversion \
     zlib-devel
 
-ARG CMAKE_VERSION="v3.16.4"
-RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
-    && git clone \
-        -b $CMAKE_VERSION \
-        --depth=1 \
-        https://github.com/Kitware/CMake.git \
-    && cd CMake \
-    && ./bootstrap \
-        --parallel=$NPROCS -- \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_USE_OPENSSL=OFF \
-    && make -j$NPROCS \
-    && make install \
-    && ln -fs /usr/local/bin/cmake /usr/bin/cmake \
-    && rm -rf $TMP_DIR
+RUN /opt/python/cp38-cp38/bin/pip install \
+    cmake \
+    &&  ln -fs /opt/python/cp38-cp38/bin/cmake /usr/bin/cmake
 
 ARG GMP_VERSION="6.1.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
@@ -319,7 +307,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && echo 'CMAKE_FLAGS+=" -DDUNE_COPASI_SD_EXECUTABLE=ON"' >> opts.txt \
     && echo 'CMAKE_FLAGS+=" -DDUNE_COPASI_MD_EXECUTABLE=ON"' >> opts.txt \
     && echo 'CMAKE_FLAGS+=" -DCMAKE_CXX_FLAGS='"'"'-fvisibility=hidden -fpic -static-libstdc++'"'"' "' >> opts.txt \
-    && echo 'MAKE_FLAGS="-j6 VERBOSE=1"' >> opts.txt \
+    && echo 'MAKE_FLAGS="-j'"$NPROCS"' VERBOSE=1"' >> opts.txt \
     && export DUNE_OPTIONS_FILE="opts.txt" \
     && export DUNECONTROL=./dune-common/bin/dunecontrol \
     && git clone \
@@ -362,12 +350,14 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-02-28-d5cc00d
+FROM quay.io/pypa/manylinux2010_x86_64:2020-03-07-1825e8f
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG BUILD_DIR=/opt/smelibs
 
 COPY --from=builder $BUILD_DIR $BUILD_DIR
+
+COPY --from=pypywheels/manylinux2010-pypy_x86_64:2020-02-29-40260b6 /opt/pypy /opt/pypy
 
 RUN /opt/python/cp38-cp38/bin/pip install \
     cmake \

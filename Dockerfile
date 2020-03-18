@@ -351,16 +351,24 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && rm -rf $TMP_DIR
 
 FROM quay.io/pypa/manylinux2010_x86_64:2020-03-07-1825e8f
-MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG BUILD_DIR=/opt/smelibs
 
-COPY --from=builder $BUILD_DIR $BUILD_DIR
-
-COPY --from=pypywheels/manylinux2010-pypy_x86_64:2020-02-29-40260b6 /opt/pypy /opt/pypy
-
+# Install cmake and ccache
 RUN /opt/python/cp38-cp38/bin/pip install \
-    cmake \
-    &&  ln -fs /opt/python/cp38-cp38/bin/cmake /usr/bin/cmake
+        cmake \
+    && ln -fs /opt/python/cp38-cp38/bin/cmake /usr/bin/cmake \
+    && yum install -q -y \
+        ccache
 
+# Setup ccache
+ENV CCACHE_DIR=/tmp/ccache
+ENV CCACHE_BASEDIR=/tmp
+ENV CMAKE_CXX_COMPILER_LAUNCHER="ccache"
+
+# SME static libs
+COPY --from=builder $BUILD_DIR $BUILD_DIR
 ENV CMAKE_PREFIX_PATH="$BUILD_DIR;$BUILD_DIR/lib64/cmake"
+
+# PyPy binaries/headers
+COPY --from=pypywheels/manylinux2010-pypy_x86_64 /opt/pypy /opt/pypy

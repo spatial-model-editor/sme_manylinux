@@ -1,9 +1,9 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-03-07-1825e8f as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2020-06-16-1ee6b68 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
-ARG NPROCS=2
+ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
 
@@ -59,7 +59,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG LIBTIFF_VERSION="v4.0.10"
+ARG LIBTIFF_VERSION="v4.1.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBTIFF_VERSION \
@@ -84,6 +84,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -Dmdi=OFF \
         -Dwebp=OFF \
         -Dzlib=OFF \
+        -DGLUT_INCLUDE_DIR=GLUT_INCLUDE_DIR-NOTFOUND \
+        -DOPENGL_INCLUDE_DIR=OPENGL_INCLUDE_DIR-NOTFOUND \
         .. \
     && make -j$NPROCS \
     && make test \
@@ -133,7 +135,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG TBB_VERSION="v2020.1"
+ARG TBB_VERSION="v2020.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $TBB_VERSION \
@@ -174,7 +176,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG QT5_VERSION="v5.14.1"
+ARG QT5_VERSION="v5.14.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \
@@ -212,7 +214,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG FMT_VERSION="6.1.2"
+ARG FMT_VERSION="6.2.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FMT_VERSION \
@@ -235,7 +237,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="v1.5.0"
+ARG SPDLOG_VERSION="v1.6.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \
@@ -321,7 +323,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && $DUNECONTROL make install \
     && rm -rf $TMP_DIR
 
-ARG LIBSBML_REVISION="26285"
+ARG LIBSBML_REVISION="26291"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && svn \
         -q \
@@ -350,7 +352,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-03-07-1825e8f
+FROM quay.io/pypa/manylinux2010_x86_64:2020-06-16-1ee6b68
 
 ARG BUILD_DIR=/opt/smelibs
 

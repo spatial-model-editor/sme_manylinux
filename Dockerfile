@@ -374,3 +374,6 @@ ENV CMAKE_PREFIX_PATH="$BUILD_DIR;$BUILD_DIR/lib64/cmake"
 
 # PyPy binaries/headers
 COPY --from=pypywheels/manylinux2010-pypy_x86_64 /opt/pypy /opt/pypy
+
+# Remove Python 3.9 - still in beta
+RUN rm -rf /opt/python/cp39-cp39

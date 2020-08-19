@@ -9,3 +9,12 @@ Docker container for compiling linux python wheels for [sme](https://pypi.org/pr
 - Based on <https://quay.io/repository/pypa/manylinux2010_x86_64>
 
 - Also copies PyPy binaries from <https://hub.docker.com/r/pypywheels/manylinux2010-pypy_x86_64>
+
+To update:
+
+```
+docker build . -t lkeegan/sme_manylinux2010_x86_64:tagname
+docker push lkeegan/sme_manylinux2010_x86_64:tagname
+```
+
+where `tagname` is today's date in the form `YYYY.MM.DD.a`

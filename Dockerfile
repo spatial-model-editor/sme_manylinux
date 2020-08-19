@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-06-16-1ee6b68 as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2020-08-12-e187883 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -92,7 +92,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="9.0.1"
+ARG LLVM_VERSION="10.0.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -128,14 +128,12 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DLLVM_ENABLE_TERMINFO=OFF \
         -DLLVM_ENABLE_LIBXML2=OFF \
         -DLLVM_ENABLE_WARNINGS=OFF \
-        -DLLVM_POLLY_BUILD=OFF \
-        -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
         .. \
     && make -j$NPROCS \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG TBB_VERSION="v2020.2"
+ARG TBB_VERSION="v2020.3"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $TBB_VERSION \
@@ -176,7 +174,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG QT5_VERSION="v5.14.2"
+ARG QT5_VERSION="v5.15.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \
@@ -200,6 +198,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -qt-libpng \
         -qt-pcre \
         -qt-harfbuzz \
+        -no-zstd \
         -no-compile-examples \
         -nomake tests \
         -nomake examples \
@@ -214,7 +213,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG FMT_VERSION="6.2.1"
+ARG FMT_VERSION="7.0.3"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FMT_VERSION \
@@ -237,7 +236,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="v1.6.1"
+ARG SPDLOG_VERSION="v1.7.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \
@@ -286,13 +285,14 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DWITH_LLVM=ON \
         -DWITH_COTIRE=OFF \
         -DWITH_SYMENGINE_THREAD_SAFE=OFF \
+        -DWITH_CPP14=ON \
         .. \
     && make -j$NPROCS \
     && make test \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG DUNE_COPASI_VERSION="v0.2.0"
+ARG DUNE_COPASI_VERSION="allow_no_vtk_output"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && echo 'CMAKE_FLAGS=" -G '"'"'Unix Makefiles'"'"'"' > opts.txt \
     && echo 'CMAKE_FLAGS+=" -DCMAKE_CXX_STANDARD=17 "' >> opts.txt \
@@ -323,12 +323,13 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && $DUNECONTROL make install \
     && rm -rf $TMP_DIR
 
-ARG LIBSBML_REVISION="26291"
+ARG LIBSBML_VERSION="development"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
-    && svn \
-        -q \
-        co https://svn.code.sf.net/p/sbml/code/branches/libsbml-experimental@$LIBSBML_REVISION \
-    && cd libsbml-experimental \
+    && git clone \
+        -b $LIBSBML_VERSION \
+        --depth=1 \
+        https://github.com/sbmlteam/libsbml.git \
+    && cd libsbml \
     && mkdir build \
     && cd build \
     && cmake \
@@ -352,7 +353,129 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-06-16-1ee6b68
+ARG OPENCV_VERSION="4.4.0"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        -b $OPENCV_VERSION \
+        --depth=1 \
+        https://github.com/opencv/opencv.git \
+    && cd opencv \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        -DBUILD_opencv_apps=OFF \
+        -DBUILD_opencv_calib3d=OFF \
+        -DBUILD_opencv_core=ON \
+        -DBUILD_opencv_dnn=OFF \
+        -DBUILD_opencv_features2d=OFF \
+        -DBUILD_opencv_flann=OFF \
+        -DBUILD_opencv_gapi=OFF \
+        -DBUILD_opencv_highgui=OFF \
+        -DBUILD_opencv_imgcodecs=OFF \
+        -DBUILD_opencv_imgproc=ON \
+        -DBUILD_opencv_java_bindings_generator=OFF \
+        -DBUILD_opencv_js=OFF \
+        -DBUILD_opencv_ml=OFF \
+        -DBUILD_opencv_objdetect=OFF \
+        -DBUILD_opencv_photo=OFF \
+        -DBUILD_opencv_python_bindings_generator=OFF \
+        -DBUILD_opencv_python_tests=OFF \
+        -DBUILD_opencv_stitching=OFF \
+        -DBUILD_opencv_ts=OFF \
+        -DBUILD_opencv_video=OFF \
+        -DBUILD_opencv_videoio=OFF \
+        -DBUILD_opencv_world=OFF \
+        -DBUILD_CUDA_STUBS:BOOL=OFF \
+        -DBUILD_DOCS:BOOL=OFF \
+        -DBUILD_EXAMPLES:BOOL=OFF \
+        -DBUILD_FAT_JAVA_LIB:BOOL=OFF \
+        -DBUILD_IPP_IW:BOOL=OFF \
+        -DBUILD_ITT:BOOL=OFF \
+        -DBUILD_JASPER:BOOL=OFF \
+        -DBUILD_JAVA:BOOL=OFF \
+        -DBUILD_JPEG:BOOL=OFF \
+        -DBUILD_OPENEXR:BOOL=OFF \
+        -DBUILD_PACKAGE:BOOL=OFF \
+        -DBUILD_PERF_TESTS:BOOL=OFF \
+        -DBUILD_PNG:BOOL=OFF \
+        -DBUILD_PROTOBUF:BOOL=OFF \
+        -DBUILD_SHARED_LIBS:BOOL=OFF \
+        -DBUILD_TBB:BOOL=OFF \
+        -DBUILD_TESTS:BOOL=OFF \
+        -DBUILD_TIFF:BOOL=OFF \
+        -DBUILD_USE_SYMLINKS:BOOL=OFF \
+        -DBUILD_WEBP:BOOL=OFF \
+        -DBUILD_WITH_DEBUG_INFO:BOOL=OFF \
+        -DBUILD_WITH_DYNAMIC_IPP:BOOL=OFF \
+        -DBUILD_ZLIB:BOOL=ON \
+        -DWITH_1394:BOOL=OFF \
+        -DWITH_ADE:BOOL=OFF \
+        -DWITH_ARAVIS:BOOL=OFF \
+        -DWITH_CLP:BOOL=OFF \
+        -DWITH_CUDA:BOOL=OFF \
+        -DWITH_EIGEN:BOOL=OFF \
+        -DWITH_FFMPEG:BOOL=OFF \
+        -DWITH_FREETYPE:BOOL=OFF \
+        -DWITH_GDAL:BOOL=OFF \
+        -DWITH_GDCM:BOOL=OFF \
+        -DWITH_GPHOTO2:BOOL=OFF \
+        -DWITH_GSTREAMER:BOOL=OFF \
+        -DWITH_GTK:BOOL=OFF \
+        -DWITH_GTK_2_X:BOOL=OFF \
+        -DWITH_HALIDE:BOOL=OFF \
+        -DWITH_HPX:BOOL=OFF \
+        -DWITH_IMGCODEC_HDR:BOOL=OFF \
+        -DWITH_IMGCODEC_PFM:BOOL=OFF \
+        -DWITH_IMGCODEC_PXM:BOOL=OFF \
+        -DWITH_IMGCODEC_SUNRASTER:BOOL=OFF \
+        -DWITH_INF_ENGINE:BOOL=OFF \
+        -DWITH_IPP:BOOL=OFF \
+        -DWITH_ITT:BOOL=OFF \
+        -DWITH_JASPER:BOOL=OFF \
+        -DWITH_JPEG:BOOL=OFF \
+        -DWITH_LAPACK:BOOL=OFF \
+        -DWITH_LIBREALSENSE:BOOL=OFF \
+        -DWITH_MFX:BOOL=OFF \
+        -DWITH_NGRAPH:BOOL=OFF \
+        -DWITH_OPENCL:BOOL=OFF \
+        -DWITH_OPENCLAMDBLAS:BOOL=OFF \
+        -DWITH_OPENCLAMDFFT:BOOL=OFF \
+        -DWITH_OPENCL_SVM:BOOL=OFF \
+        -DWITH_OPENEXR:BOOL=OFF \
+        -DWITH_OPENGL:BOOL=OFF \
+        -DWITH_OPENJPEG:BOOL=OFF \
+        -DWITH_OPENMP:BOOL=OFF \
+        -DWITH_OPENNI:BOOL=OFF \
+        -DWITH_OPENNI2:BOOL=OFF \
+        -DWITH_OPENVX:BOOL=OFF \
+        -DWITH_PLAIDML:BOOL=OFF \
+        -DWITH_PNG:BOOL=OFF \
+        -DWITH_PROTOBUF:BOOL=OFF \
+        -DWITH_PTHREADS_PF:BOOL=OFF \
+        -DWITH_PVAPI:BOOL=OFF \
+        -DWITH_QT:BOOL=OFF \
+        -DWITH_QUIRC:BOOL=OFF \
+        -DWITH_TBB:BOOL=OFF \
+        -DWITH_TIFF:BOOL=OFF \
+        -DWITH_V4L:BOOL=OFF \
+        -DWITH_VA:BOOL=OFF \
+        -DWITH_VA_INTEL:BOOL=OFF \
+        -DWITH_VTK:BOOL=OFF \
+        -DWITH_VULKAN:BOOL=OFF \
+        -DWITH_WEBP:BOOL=OFF \
+        -DWITH_XIMEA:BOOL=OFF \
+        -DWITH_XINE:BOOL=OFF \
+        .. \
+    && make -j$NPROCS \
+    && make install \
+    && rm -rf $TMP_DIR
+
+FROM quay.io/pypa/manylinux2010_x86_64:2020-08-12-e187883
 
 ARG BUILD_DIR=/opt/smelibs
 
@@ -373,7 +496,7 @@ COPY --from=builder $BUILD_DIR $BUILD_DIR
 ENV CMAKE_PREFIX_PATH="$BUILD_DIR;$BUILD_DIR/lib64/cmake"
 
 # PyPy binaries/headers
-COPY --from=pypywheels/manylinux2010-pypy_x86_64 /opt/pypy /opt/pypy
+COPY --from=pypywheels/manylinux2010-pypy_x86_64:2020-07-02-fd8c128 /opt/pypy /opt/pypy
 
 # Remove Python 3.9 - still in beta
 RUN rm -rf /opt/python/cp39-cp39

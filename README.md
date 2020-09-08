@@ -17,4 +17,4 @@ docker build . -t lkeegan/sme_manylinux2010_x86_64:tagname
 docker push lkeegan/sme_manylinux2010_x86_64:tagname
 ```
 
-where `tagname` is today's date in the form `YYYY.MM.DD.a`
+where `tagname` is today's date in the form `YYYY.MM.DD`

@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-08-20-df89e22 as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2020-09-20-8663c7c as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -386,7 +386,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG SYMENGINE_VERSION="v0.6.0"
+ARG SYMENGINE_VERSION="master"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SYMENGINE_VERSION \
@@ -408,7 +408,6 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DWITH_LLVM=ON \
         -DWITH_COTIRE=OFF \
         -DWITH_SYMENGINE_THREAD_SAFE=OFF \
-        -DWITH_CPP14=ON \
         .. \
     && make -j$NPROCS \
     && make test \
@@ -431,6 +430,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && echo 'CMAKE_FLAGS+=" -DDUNE_USE_ONLY_STATIC_LIBS=ON -DF77=true"' >> opts.txt \
     && echo 'CMAKE_FLAGS+=" -DDUNE_COPASI_SD_EXECUTABLE=ON"' >> opts.txt \
     && echo 'CMAKE_FLAGS+=" -DDUNE_COPASI_MD_EXECUTABLE=ON"' >> opts.txt \
+    && echo 'CMAKE_FLAGS+=" -DUSE_FALLBACK_FILESYSTEM=ON"' >> opts.txt \
     && echo 'CMAKE_FLAGS+=" -DCMAKE_CXX_FLAGS='"'"'-fvisibility=hidden -fpic -static-libstdc++'"'"' "' >> opts.txt \
     && echo 'MAKE_FLAGS="-j'"$NPROCS"' VERBOSE=1"' >> opts.txt \
     && export DUNE_OPTIONS_FILE="opts.txt" \
@@ -476,7 +476,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-08-20-df89e22
+FROM quay.io/pypa/manylinux2010_x86_64:2020-09-20-8663c7c
 
 ARG BUILD_DIR=/opt/smelibs
 
@@ -492,12 +492,12 @@ ENV CCACHE_DIR=/tmp/ccache
 ENV CCACHE_BASEDIR=/tmp
 ENV CMAKE_CXX_COMPILER_LAUNCHER="ccache"
 
+# use dune-copasi fallback filesystem
+ENV SME_DUNE_COPASI_USE_FALLBACK_FILESYSTEM="on"
+
 # SME static libs
 COPY --from=builder $BUILD_DIR $BUILD_DIR
 ENV CMAKE_PREFIX_PATH="$BUILD_DIR;$BUILD_DIR/lib64/cmake"
 
 # PyPy binaries/headers
 COPY --from=pypywheels/manylinux2010-pypy_x86_64:2020-07-02-fd8c128 /opt/pypy /opt/pypy
-
-# Remove Python 3.9 - still in beta
-RUN rm -rf /opt/python/cp39-cp39

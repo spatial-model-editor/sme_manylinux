@@ -12,7 +12,7 @@ Docker container for compiling linux python wheels for [sme](https://pypi.org/pr
 
 To update:
 
-```
+```bash
 docker build . -t lkeegan/sme_manylinux2010_x86_64:tagname
 docker push lkeegan/sme_manylinux2010_x86_64:tagname
 ```

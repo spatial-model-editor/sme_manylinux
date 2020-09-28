@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-09-20-8663c7c as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2020-09-26-58cbbcd as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -175,7 +175,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG QT5_VERSION="v5.15.0"
+ARG QT5_VERSION="v5.15.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \
@@ -414,7 +414,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG DUNE_COPASI_VERSION="26-add-simple-adaptive-timestepping"
+ARG DUNE_COPASI_VERSION="master"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && echo 'CMAKE_FLAGS=" -G '"'"'Unix Makefiles'"'"'"' > opts.txt \
     && echo 'CMAKE_FLAGS+=" -DCMAKE_CXX_STANDARD=17 "' >> opts.txt \
@@ -476,7 +476,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-09-20-8663c7c
+FROM quay.io/pypa/manylinux2010_x86_64:2020-09-26-58cbbcd
 
 ARG BUILD_DIR=/opt/smelibs
 
@@ -500,4 +500,4 @@ COPY --from=builder $BUILD_DIR $BUILD_DIR
 ENV CMAKE_PREFIX_PATH="$BUILD_DIR;$BUILD_DIR/lib64/cmake"
 
 # PyPy binaries/headers
-COPY --from=pypywheels/manylinux2010-pypy_x86_64:2020-07-02-fd8c128 /opt/pypy /opt/pypy
+COPY --from=pypywheels/manylinux2010-pypy_x86_64:2020-09-26-8f210b5 /opt/pypy /opt/pypy

@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-10-01-c9db36e as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2020-10-06-786a931 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -151,7 +151,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp -r include/tbb $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG MUPARSER_VERSION="v2.2.6.1"
+ARG MUPARSER_VERSION="v2.3.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $MUPARSER_VERSION \
@@ -476,7 +476,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-10-01-c9db36e
+FROM quay.io/pypa/manylinux2010_x86_64:2020-10-06-786a931
 
 ARG BUILD_DIR=/opt/smelibs
 

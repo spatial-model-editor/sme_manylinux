@@ -93,7 +93,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="10.0.1"
+ARG LLVM_VERSION="11.0.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -105,7 +105,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cmake \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
-        -DPYTHON_EXECUTABLE:FILEPATH=/opt/python/cp38-cp38/bin/python \
+        -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp38-cp38/bin/python \
         -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-linux-gnu \
         -DLLVM_TARGETS_TO_BUILD="X86" \
         -DLLVM_BUILD_TOOLS=OFF \

@@ -16,7 +16,7 @@ RUN /opt/python/cp38-cp38/bin/pip install \
     cmake \
     &&  ln -fs /opt/python/cp38-cp38/bin/cmake /usr/bin/cmake
 
-ARG GMP_VERSION="6.1.2"
+ARG GMP_VERSION="6.2.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl \
         https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.bz2 \
@@ -214,7 +214,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG OPENCV_VERSION="4.4.0"
+ARG OPENCV_VERSION="4.5.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $OPENCV_VERSION \

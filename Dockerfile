@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-10-18-c6d2d92 as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2020-11-11-201fb79 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -336,7 +336,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG FMT_VERSION="7.0.3"
+ARG FMT_VERSION="7.1.3"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FMT_VERSION \
@@ -431,7 +431,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && echo 'CMAKE_FLAGS+=" -DDUNE_COPASI_SD_EXECUTABLE=ON"' >> opts.txt \
     && echo 'CMAKE_FLAGS+=" -DDUNE_COPASI_MD_EXECUTABLE=ON"' >> opts.txt \
     && echo 'CMAKE_FLAGS+=" -DUSE_FALLBACK_FILESYSTEM=ON"' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DCMAKE_CXX_FLAGS='"'"'-fvisibility=hidden -fpic -static-libstdc++'"'"' "' >> opts.txt \
+    && echo 'CMAKE_FLAGS+=" -DCMAKE_CXX_FLAGS='"'"'-fvisibility=hidden -fpic'"'"' "' >> opts.txt \
     && echo 'MAKE_FLAGS="-j'"$NPROCS"' VERBOSE=1"' >> opts.txt \
     && export DUNE_OPTIONS_FILE="opts.txt" \
     && export DUNECONTROL=./dune-common/bin/dunecontrol \
@@ -476,7 +476,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2020-10-18-c6d2d92
+FROM quay.io/pypa/manylinux2010_x86_64:2020-11-11-201fb79
 
 ARG BUILD_DIR=/opt/smelibs
 
@@ -500,4 +500,4 @@ COPY --from=builder $BUILD_DIR $BUILD_DIR
 ENV CMAKE_PREFIX_PATH="$BUILD_DIR;$BUILD_DIR/lib64/cmake"
 
 # PyPy binaries/headers
-COPY --from=pypywheels/manylinux2010-pypy_x86_64:2020-09-26-8f210b5 /opt/pypy /opt/pypy
+COPY --from=pypywheels/manylinux2010-pypy_x86_64:2020-11-21-a03b9e9 /opt/pypy /opt/pypy

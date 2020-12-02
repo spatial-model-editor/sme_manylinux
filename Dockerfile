@@ -498,6 +498,3 @@ ENV SME_DUNE_COPASI_USE_FALLBACK_FILESYSTEM="on"
 # SME static libs
 COPY --from=builder $BUILD_DIR $BUILD_DIR
 ENV CMAKE_PREFIX_PATH="$BUILD_DIR;$BUILD_DIR/lib64/cmake"
-
-# PyPy binaries/headers
-COPY --from=pypywheels/manylinux2010-pypy_x86_64:2020-11-21-a03b9e9 /opt/pypy /opt/pypy

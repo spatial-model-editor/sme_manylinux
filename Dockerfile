@@ -1,9 +1,9 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-01-12-ff3830d as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2021-02-06-3d322a5 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
-ARG NPROCS=8
+ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
 
@@ -26,7 +26,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ./configure \
         --prefix=$BUILD_DIR \
         --disable-shared \
-        --disable-assembly \
+        --host=x86_64-unknown-linux-gnu \
         --enable-static \
         --with-pic \
         --enable-cxx \
@@ -34,6 +34,38 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make check \
     && make install \
     && rm -rf $TMP_DIR
+
+ARG MPFR_VERSION="4.1.0"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && curl \
+        https://www.mpfr.org/mpfr-current/mpfr-${MPFR_VERSION}.tar.bz2 \
+        --output mpfr.tar.bz2 \
+    && tar xjf mpfr.tar.bz2 \
+    && cd mpfr-${MPFR_VERSION} \
+    && ./configure \
+        --prefix=$BUILD_DIR \
+        --disable-shared \
+        --host=x86_64-unknown-linux-gnu \
+        --enable-static \
+        --with-pic \
+        --with-gmp-lib=$BUILD_DIR/lib \
+        --with-gmp-include=$BUILD_DIR/include \
+    && make -j$NPROCS \
+    && make check \
+    && make install \
+    && rm -rf $TMP_DIR
+
+ARG BOOST_VERSION="1.75.0"
+ARG BOOST_VERSION_="1_75_0"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && curl -L \
+        "https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
+        --output boost.tar.bz2 \
+    && tar xjf boost.tar.bz2 \
+    && cd boost_${BOOST_VERSION_} \
+    && cp -r boost $BUILD_DIR/include/. \
+    && rm -rf $TMP_DIR
+
 
 ARG LIBEXPAT_VERSION="R_2_2_10"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
@@ -446,7 +478,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && $DUNECONTROL make install \
     && rm -rf $TMP_DIR
 
-ARG LIBSBML_VERSION="development"
+ARG LIBSBML_VERSION="v5.19.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBSBML_VERSION \
@@ -476,7 +508,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-01-12-ff3830d
+FROM quay.io/pypa/manylinux2010_x86_64:2021-02-06-3d322a5
 
 ARG BUILD_DIR=/opt/smelibs
 

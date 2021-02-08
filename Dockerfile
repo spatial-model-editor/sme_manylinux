@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-02-06-3d322a5 as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2021-02-07-7816579 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -66,6 +66,25 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp -r boost $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
+ARG CGAL_VERSION="v5.2"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        -b $CGAL_VERSION \
+        --depth=1 \
+        https://github.com/CGAL/cgal.git \
+    && cd cgal \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        .. \
+    && make -j$NPROCS \
+    && make install \
+    && rm -rf $TMP_DIR
 
 ARG LIBEXPAT_VERSION="R_2_2_10"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
@@ -508,7 +527,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-02-06-3d322a5
+FROM quay.io/pypa/manylinux2010_x86_64:2021-02-07-7816579
 
 ARG BUILD_DIR=/opt/smelibs
 

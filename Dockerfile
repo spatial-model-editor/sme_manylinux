@@ -465,36 +465,20 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG DUNE_COPASI_VERSION="master"
+ARG DUNE_COPASI_VERSION="muparser_cmake"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
-    && echo 'CMAKE_FLAGS=" -G '"'"'Unix Makefiles'"'"'"' > opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DCMAKE_CXX_STANDARD=17 "' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DCMAKE_BUILD_TYPE=Release "' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DCMAKE_INSTALL_PREFIX='"$BUILD_DIR"' "' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DGMPXX_INCLUDE_DIR:PATH='"$BUILD_DIR"'/include "' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DGMPXX_LIB:FILEPATH='"$BUILD_DIR"'/lib/libgmpxx.a "' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DGMP_LIB:FILEPATH='"$BUILD_DIR"'/lib/libgmp.a "' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DCMAKE_PREFIX_PATH='"$BUILD_DIR"' "' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -Dfmt_ROOT='"$BUILD_DIR"' "' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DDUNE_PYTHON_VIRTUALENV_SETUP=0 -DDUNE_PYTHON_ALLOW_GET_PIP=0 "' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DCMAKE_DISABLE_FIND_PACKAGE_QuadMath=TRUE -DBUILD_TESTING=OFF "' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DDUNE_USE_ONLY_STATIC_LIBS=ON -DF77=true"' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DDUNE_COPASI_SD_EXECUTABLE=ON"' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DDUNE_COPASI_MD_EXECUTABLE=ON"' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DUSE_FALLBACK_FILESYSTEM=ON"' >> opts.txt \
-    && echo 'CMAKE_FLAGS+=" -DCMAKE_CXX_FLAGS='"'"'-fvisibility=hidden -fpic'"'"' "' >> opts.txt \
-    && echo 'MAKE_FLAGS="-j'"$NPROCS"' VERBOSE=1"' >> opts.txt \
-    && export DUNE_OPTIONS_FILE="opts.txt" \
-    && export DUNECONTROL=./dune-common/bin/dunecontrol \
+    && export DUNE_COPASI_USE_STATIC_DEPS=ON \
+    && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \
+    && export MAKE_FLAGS="-j'"$NPROCS"' VERBOSE=1" \
+    && export DUNE_USE_FALLBACK_FILESYSTEM=ON \
     && git clone \
-        -b ${DUNE_COPASI_VERSION}  \
+        -b ${DUNE_COPASI_VERSION} \
         --depth 1 \
-        --recursive \
         https://gitlab.dune-project.org/copasi/dune-copasi.git \
-    && bash dune-copasi/.ci/setup.sh \
-    && rm -rf dune-testtools \
-    && bash dune-copasi/.ci/build.sh \
-    && $DUNECONTROL make install \
+    && cd dune-copasi \
+    && bash dune-copasi.opts \
+    && bash .ci/setup_dune $PWD/dune-copasi.opts \
+    && bash .ci/install $PWD/dune-copasi.opts \
     && rm -rf $TMP_DIR
 
 ARG LIBSBML_VERSION="v5.19.0"

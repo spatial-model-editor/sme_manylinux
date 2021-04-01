@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-03-15-2ae1698 as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2021-03-24-f395ab8 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -15,6 +15,22 @@ RUN yum install -q -y \
 RUN /opt/python/cp38-cp38/bin/pip install \
     cmake \
     &&  ln -fs /opt/python/cp38-cp38/bin/cmake /usr/bin/cmake
+
+ARG CEREAL_VERSION="master"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        -b $CEREAL_VERSION \
+        --depth=1 \
+        https://github.com/USCiLab/cereal.git \
+    && cd cereal \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -DJUST_INSTALL_CEREAL=ON \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        .. \
+    && make install \
+    && rm -rf $TMP_DIR
 
 ARG GMP_VERSION="6.2.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
@@ -86,7 +102,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG LIBEXPAT_VERSION="R_2_2_10"
+ARG LIBEXPAT_VERSION="R_2_3_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBEXPAT_VERSION \
@@ -410,7 +426,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="v1.8.2"
+ARG SPDLOG_VERSION="v1.8.5"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \
@@ -512,7 +528,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-03-15-2ae1698
+FROM quay.io/pypa/manylinux2010_x86_64:2021-03-24-f395ab8
 
 ARG BUILD_DIR=/opt/smelibs
 

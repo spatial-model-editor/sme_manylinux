@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-04-09-c61dabe as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2021-04-27-6967be9 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -481,12 +481,13 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG DUNE_COPASI_VERSION="muparser_cmake"
+ARG DUNE_COPASI_VERSION="v1.1.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export DUNE_COPASI_USE_STATIC_DEPS=ON \
     && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \
     && export MAKE_FLAGS="-j$NPROCS VERBOSE=1" \
     && export DUNE_USE_FALLBACK_FILESYSTEM=ON \
+    && export CMAKE_CXX_FLAGS='-fvisibility=hidden' \
     && git clone \
         -b ${DUNE_COPASI_VERSION} \
         --depth 1 \
@@ -495,7 +496,6 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && bash dune-copasi.opts \
     && bash .ci/setup_dune $PWD/dune-copasi.opts \
     && bash .ci/install $PWD/dune-copasi.opts \
-    && mv /opt/smelibs/lib/cmake/dune-copasi/* /opt/smelibs/lib64/cmake/dune-copasi/. \
     && rm -rf $TMP_DIR
 
 ARG LIBSBML_VERSION="v5.19.0"
@@ -528,7 +528,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-04-09-c61dabe
+FROM quay.io/pypa/manylinux2010_x86_64:2021-04-27-6967be9
 
 ARG BUILD_DIR=/opt/smelibs
 

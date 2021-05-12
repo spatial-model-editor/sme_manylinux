@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-04-27-6967be9 as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2021-05-12-9010863 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -12,9 +12,8 @@ RUN yum install -q -y \
     wget \
     zlib-devel
 
-RUN /opt/python/cp38-cp38/bin/pip install \
-    cmake \
-    &&  ln -fs /opt/python/cp38-cp38/bin/cmake /usr/bin/cmake
+RUN /opt/python/cp38-cp38/bin/pip install ninja \
+    && ln -fs /opt/python/cp38-cp38/bin/ninja /usr/bin/ninja
 
 ARG CEREAL_VERSION="master"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
@@ -26,10 +25,11 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && mkdir build \
     && cd build \
     && cmake \
+        -GNinja \
         -DJUST_INSTALL_CEREAL=ON \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         .. \
-    && make install \
+    && ninja install \
     && rm -rf $TMP_DIR
 
 ARG GMP_VERSION="6.2.0"
@@ -75,7 +75,7 @@ ARG BOOST_VERSION="1.75.0"
 ARG BOOST_VERSION_="1_75_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
-        "https://dl.bintray.com/boostorg/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
+        "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
         --output boost.tar.bz2 \
     && tar xjf boost.tar.bz2 \
     && cd boost_${BOOST_VERSION_} \
@@ -92,14 +92,15 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && mkdir build \
     && cd build \
     && cmake \
+        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
         -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         .. \
-    && make -j$NPROCS \
-    && make install \
+    && ninja \
+    && ninja install \
     && rm -rf $TMP_DIR
 
 ARG LIBEXPAT_VERSION="R_2_3_0"
@@ -112,6 +113,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && mkdir build \
     && cd build \
     && cmake \
+        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
@@ -122,9 +124,9 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DEXPAT_BUILD_TOOLS=OFF \
         -DEXPAT_SHARED_LIBS=OFF \
         ../expat \
-    && make -j$NPROCS \
-    && make test \
-    && make install \
+    && ninja \
+    && ninja test \
+    && ninja install \
     && rm -rf $TMP_DIR
 
 ARG LIBTIFF_VERSION="v4.1.0"
@@ -137,6 +139,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake \
+        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
@@ -155,9 +158,9 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DGLUT_INCLUDE_DIR=GLUT_INCLUDE_DIR-NOTFOUND \
         -DOPENGL_INCLUDE_DIR=OPENGL_INCLUDE_DIR-NOTFOUND \
         .. \
-    && make -j$NPROCS \
-    && make test \
-    && make install \
+    && ninja \
+    && ninja test \
+    && ninja install \
     && rm -rf $TMP_DIR
 
 ARG LLVM_VERSION="12.0.0"
@@ -170,6 +173,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && mkdir build \
     && cd build \
     && cmake \
+        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp38-cp38/bin/python \
@@ -197,8 +201,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DLLVM_ENABLE_LIBXML2=OFF \
         -DLLVM_ENABLE_WARNINGS=OFF \
         .. \
-    && make -j$NPROCS \
-    && make install \
+    && ninja \
+    && ninja install \
     && rm -rf $TMP_DIR
 
 ARG TBB_VERSION="v2020.3"
@@ -228,6 +232,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake \
+        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
@@ -237,12 +242,12 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DENABLE_OPENMP=OFF \
         -DENABLE_SAMPLES=OFF \
         .. \
-    && make -j$NPROCS \
-    && make test \
-    && make install \
+    && ninja \
+    && ninja test \
+    && ninja install \
     && rm -rf $TMP_DIR
 
-ARG QT5_VERSION="v5.15.2"
+ARG QT5_VERSION="v6.1.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \
@@ -252,33 +257,33 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cd .. \
     && mkdir build \
     && cd build \
-    && ../qt5/qtbase/configure \
-        -opensource \
-        -confirm-license \
-        -prefix $BUILD_DIR \
-        -release \
-        -static \
-        -silent \
-        -no-xcb \
-        -sql-sqlite \
-        -qt-zlib \
-        -qt-libjpeg \
-        -qt-libpng \
-        -qt-pcre \
-        -qt-harfbuzz \
-        -no-zstd \
-        -no-compile-examples \
-        -nomake tests \
-        -nomake examples \
-        -no-opengl \
-        -no-openssl \
-        -no-sql-odbc \
-        -no-icu \
-        -no-feature-concurrent \
-        -no-feature-xml \
-        -feature-testlib \
-    && make -j$NPROCS \
-    && make install \
+    && cmake ../qt5/qtbase \
+        -GNinja \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
+        -DQT_USE_BUNDLED_BundledFreetype=ON \
+        -DQT_USE_BUNDLED_BundledHarfbuzz=ON \
+        -DQT_USE_BUNDLED_BundledLibpng=ON \
+        -DQT_USE_BUNDLED_BundledPcre2=ON \
+        -DFEATURE_system_doubleconversion=OFF \
+        -DFEATURE_system_harfbuzz=OFF \
+        -DFEATURE_system_jpeg=OFF \
+        -DFEATURE_system_libb2=OFF \
+        -DFEATURE_system_pcre2=OFF \
+        -DFEATURE_system_png=OFF \
+        -DFEATURE_system_proxies=OFF \
+        -DFEATURE_system_textmarkdownreader=OFF \
+        -DFEATURE_system_zlib=OFF \
+        -DFEATURE_zstd=OFF \
+        -DFEATURE_openssl=OFF \
+        -DFEATURE_sql=OFF \
+        -DFEATURE_icu=OFF \
+        -DFEATURE_testlib=ON \
+        -DBUILD_WITH_PCH=OFF \
+        -DFEATURE_xcb=OFF \
+    && ninja \
+    && ninja install \
     && rm -rf $TMP_DIR
 
 ARG OPENCV_VERSION="4.5.2"
@@ -291,6 +296,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && mkdir build \
     && cd build \
     && cmake \
+        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
@@ -399,8 +405,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DWITH_XIMEA:BOOL=OFF \
         -DWITH_XINE:BOOL=OFF \
         .. \
-    && make -j$NPROCS \
-    && make install \
+    && ninja \
+    && ninja install \
     && rm -rf $TMP_DIR
 
 ARG FMT_VERSION="7.1.3"
@@ -413,6 +419,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && mkdir build \
     && cd build \
     && cmake \
+        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
@@ -421,9 +428,9 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_CXX_STANDARD=17 \
         -DFMT_DOC=OFF \
         .. \
-    && make -j$NPROCS \
-    && make test \
-    && make install \
+    && ninja \
+    && ninja test \
+    && ninja install \
     && rm -rf $TMP_DIR
 
 ARG SPDLOG_VERSION="v1.8.5"
@@ -436,6 +443,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake \
+        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
@@ -448,9 +456,9 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DSPDLOG_NO_ATOMIC_LEVELS=ON \
         -DCMAKE_PREFIX_PATH=$BUILD_DIR \
         .. \
-    && make -j$NPROCS \
-    && make test \
-    && make install \
+    && ninja \
+    && ninja test \
+    && ninja install \
     && rm -rf $TMP_DIR
 
 ARG SYMENGINE_VERSION="v0.7.0"
@@ -463,6 +471,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && mkdir build \
     && cd build \
     && cmake \
+        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
@@ -476,9 +485,9 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DWITH_COTIRE=OFF \
         -DWITH_SYMENGINE_THREAD_SAFE=OFF \
         .. \
-    && make -j$NPROCS \
-    && make test \
-    && make install \
+    && ninja \
+    && ninja test \
+    && ninja install \
     && rm -rf $TMP_DIR
 
 ARG DUNE_COPASI_VERSION="v1.1.0"
@@ -488,6 +497,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export MAKE_FLAGS="-j$NPROCS VERBOSE=1" \
     && export DUNE_USE_FALLBACK_FILESYSTEM=ON \
     && export CMAKE_CXX_FLAGS='-fvisibility=hidden' \
+    && export CMAKE_FLAGS='-GNinja' \
     && git clone \
         -b ${DUNE_COPASI_VERSION} \
         --depth 1 \
@@ -508,6 +518,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && mkdir build \
     && cd build \
     && cmake \
+        -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
@@ -524,28 +535,22 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DLIBEXPAT_INCLUDE_DIR=$BUILD_DIR/include \
         -DLIBEXPAT_LIBRARY=$BUILD_DIR/lib64/libexpat.a \
         .. \
-    && make -j$NPROCS \
-    && make install \
+    && ninja \
+    && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-04-27-6967be9
+FROM quay.io/pypa/manylinux2010_x86_64:2021-05-12-9010863
 
 ARG BUILD_DIR=/opt/smelibs
 
-# Install cmake and ccache
-RUN /opt/python/cp38-cp38/bin/pip install \
-        cmake \
-    && ln -fs /opt/python/cp38-cp38/bin/cmake /usr/bin/cmake \
-    && yum install -q -y \
+# Install ccache
+RUN yum install -q -y \
         ccache
 
 # Setup ccache
 ENV CCACHE_DIR=/tmp/ccache
 ENV CCACHE_BASEDIR=/tmp
 ENV CMAKE_CXX_COMPILER_LAUNCHER="ccache"
-
-# use dune-copasi fallback filesystem
-ENV SME_DUNE_COPASI_USE_FALLBACK_FILESYSTEM="on"
 
 # SME static libs
 COPY --from=builder $BUILD_DIR $BUILD_DIR

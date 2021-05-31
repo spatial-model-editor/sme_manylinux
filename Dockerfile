@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-05-12-9010863 as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2021-05-30-d4af1a5 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -32,7 +32,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG GMP_VERSION="6.2.0"
+ARG GMP_VERSION="6.2.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl \
         https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.bz2 \
@@ -82,7 +82,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp -r boost $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v5.2"
+ARG CGAL_VERSION="v5.2.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -103,7 +103,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBEXPAT_VERSION="R_2_3_0"
+ARG LIBEXPAT_VERSION="R_2_4_1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBEXPAT_VERSION \
@@ -129,7 +129,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBTIFF_VERSION="v4.1.0"
+ARG LIBTIFF_VERSION="v4.3.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBTIFF_VERSION \
@@ -149,6 +149,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -Djpeg12=OFF \
         -Djbig=OFF \
         -Dlzma=OFF \
+        -Dlibdeflate=OFF \
         -Dpixarlog=OFF \
         -Dold-jpeg=OFF \
         -Dzstd=OFF \
@@ -539,7 +540,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-05-12-9010863
+FROM quay.io/pypa/manylinux2010_x86_64:2021-05-30-d4af1a5
 
 ARG BUILD_DIR=/opt/smelibs
 

@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-05-30-d4af1a5 as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2021-06-07-00faba2 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -462,7 +462,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SYMENGINE_VERSION="v0.7.0"
+ARG SYMENGINE_VERSION="master"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SYMENGINE_VERSION \
@@ -540,7 +540,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-05-30-d4af1a5
+FROM quay.io/pypa/manylinux2010_x86_64:2021-06-07-00faba2
 
 ARG BUILD_DIR=/opt/smelibs
 

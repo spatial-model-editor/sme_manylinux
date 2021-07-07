@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-06-07-00faba2 as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2021-07-04-1e3ce39 as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -12,8 +12,8 @@ RUN yum install -q -y \
     wget \
     zlib-devel
 
-RUN /opt/python/cp38-cp38/bin/pip install ninja \
-    && ln -fs /opt/python/cp38-cp38/bin/ninja /usr/bin/ninja
+RUN /opt/python/cp39-cp39/bin/pip install ninja \
+    && ln -fs /opt/python/cp39-cp39/bin/ninja /usr/bin/ninja
 
 ARG CEREAL_VERSION="master"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
@@ -71,8 +71,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.75.0"
-ARG BOOST_VERSION_="1_75_0"
+ARG BOOST_VERSION="1.76.0"
+ARG BOOST_VERSION_="1_76_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
@@ -82,7 +82,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp -r boost $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v5.2.1"
+ARG CGAL_VERSION="v5.2.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -177,7 +177,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
-        -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp38-cp38/bin/python \
+        -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp39-cp39/bin/python \
         -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-linux-gnu \
         -DLLVM_TARGETS_TO_BUILD="X86" \
         -DLLVM_BUILD_TOOLS=OFF \
@@ -248,7 +248,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG QT5_VERSION="v6.1.0"
+ARG QT5_VERSION="v6.1.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \
@@ -287,7 +287,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG OPENCV_VERSION="4.5.2"
+ARG OPENCV_VERSION="4.5.3"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $OPENCV_VERSION \
@@ -410,7 +410,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG FMT_VERSION="7.1.3"
+ARG FMT_VERSION="8.0.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FMT_VERSION \
@@ -434,7 +434,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="v1.8.5"
+ARG SPDLOG_VERSION="master"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \
@@ -540,7 +540,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-06-07-00faba2
+FROM quay.io/pypa/manylinux2010_x86_64:2021-07-04-1e3ce39
 
 ARG BUILD_DIR=/opt/smelibs
 

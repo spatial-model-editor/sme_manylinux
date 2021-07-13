@@ -82,7 +82,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp -r boost $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v5.2.2"
+ARG CGAL_VERSION="v5.3"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -164,7 +164,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="12.0.0"
+ARG LLVM_VERSION="12.0.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -434,7 +434,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="master"
+ARG SPDLOG_VERSION="v1.x"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \

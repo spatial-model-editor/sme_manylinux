@@ -1,16 +1,11 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-08-03-e7edb37 as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2021-08-21-cbf585b as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
-
-RUN yum install -q -y \
-    subversion \
-    wget \
-    zlib-devel
 
 RUN /opt/python/cp39-cp39/bin/pip install ninja \
     && ln -fs /opt/python/cp39-cp39/bin/ninja /usr/bin/ninja
@@ -71,8 +66,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.76.0"
-ARG BOOST_VERSION_="1_76_0"
+ARG BOOST_VERSION="1.77.0"
+ARG BOOST_VERSION_="1_77_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
@@ -434,7 +429,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="v1.9.1"
+ARG SPDLOG_VERSION="v1.9.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \
@@ -540,7 +535,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-08-03-e7edb37
+FROM quay.io/pypa/manylinux2010_x86_64:2021-08-21-cbf585b
 
 ARG BUILD_DIR=/opt/smelibs
 

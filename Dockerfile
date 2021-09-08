@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-08-21-cbf585b as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2021-09-06-7b0bd5d as builder
 MAINTAINER Liam Keegan "liam@keegan.ch"
 
 ARG NPROCS=24
@@ -243,12 +243,12 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG QT5_VERSION="v6.1.2"
+ARG QT_VERSION="v6.1.3"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \
     && cd qt5 \
-    && git checkout $QT5_VERSION \
+    && git checkout $QT_VERSION \
     && git submodule update --init qtbase \
     && cd .. \
     && mkdir build \
@@ -258,10 +258,6 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
-        -DQT_USE_BUNDLED_BundledFreetype=ON \
-        -DQT_USE_BUNDLED_BundledHarfbuzz=ON \
-        -DQT_USE_BUNDLED_BundledLibpng=ON \
-        -DQT_USE_BUNDLED_BundledPcre2=ON \
         -DFEATURE_system_doubleconversion=OFF \
         -DFEATURE_system_harfbuzz=OFF \
         -DFEATURE_system_jpeg=OFF \
@@ -457,7 +453,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SYMENGINE_VERSION="master"
+ARG SYMENGINE_VERSION="v0.8.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SYMENGINE_VERSION \
@@ -486,7 +482,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG DUNE_COPASI_VERSION="v1.1.0"
+ARG DUNE_COPASI_VERSION="releases/1.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export DUNE_COPASI_USE_STATIC_DEPS=ON \
     && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \
@@ -535,7 +531,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-08-21-cbf585b
+FROM quay.io/pypa/manylinux2010_x86_64:2021-09-06-7b0bd5d
 
 ARG BUILD_DIR=/opt/smelibs
 

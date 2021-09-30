@@ -1,7 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-09-12-b124c44 as builder
-MAINTAINER Liam Keegan "liam@keegan.ch"
+FROM quay.io/pypa/manylinux2010_x86_64:2021-09-27-ed30de0 as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -159,7 +158,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="12.0.1"
+ARG LLVM_VERSION="13.0.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -243,7 +242,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.1.3"
+ARG QT_VERSION="v6.2.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \
@@ -488,16 +487,16 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \
     && export MAKE_FLAGS="-j$NPROCS VERBOSE=1" \
     && export DUNE_USE_FALLBACK_FILESYSTEM=ON \
-    && export CMAKE_CXX_FLAGS='-fvisibility=hidden' \
-    && export CMAKE_FLAGS='-GNinja' \
+    && export CMAKE_CXX_FLAGS="-fvisibility=hidden" \
+    && export CMAKE_FLAGS="-GNinja" \
     && git clone \
-        -b ${DUNE_COPASI_VERSION} \
+        -b $DUNE_COPASI_VERSION \
         --depth 1 \
         https://gitlab.dune-project.org/copasi/dune-copasi.git \
     && cd dune-copasi \
     && bash dune-copasi.opts \
-    && bash .ci/setup_dune $PWD/dune-copasi.opts \
-    && bash .ci/install $PWD/dune-copasi.opts \
+    && bash .ci/setup_dune "$PWD"/dune-copasi.opts \
+    && bash .ci/install "$PWD"/dune-copasi.opts \
     && rm -rf $TMP_DIR
 
 ARG LIBSBML_VERSION="v5.19.0"
@@ -531,13 +530,14 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-09-12-b124c44
+FROM quay.io/pypa/manylinux2010_x86_64:2021-09-27-ed30de0
 
 ARG BUILD_DIR=/opt/smelibs
 
 # Install ccache
 RUN yum install -q -y \
-        ccache
+        ccache-3.1.6 \
+    && yum clean all
 
 # Setup ccache
 ENV CCACHE_DIR=/tmp/ccache

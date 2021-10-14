@@ -277,6 +277,28 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
+ARG ZLIB_VERSION="v1.2.11"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        -b $ZLIB_VERSION \
+        --depth=1 \
+        https://github.com/madler/zlib.git \
+    && cd zlib \
+    && mkdir build \
+    && cd build \
+    && cmake .. \
+        -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+    && ninja zlibstatic \
+    && cp libz.a $BUILD_DIR/lib/libz.a \
+    && cp zconf.h $BUILD_DIR/include/. \
+    && cp ../zlib.h $BUILD_DIR/include/. \
+    && rm -rf $TMP_DIR
+
 ARG OPENCV_VERSION="4.5.4"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
@@ -337,7 +359,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DBUILD_WEBP:BOOL=OFF \
         -DBUILD_WITH_DEBUG_INFO:BOOL=OFF \
         -DBUILD_WITH_DYNAMIC_IPP:BOOL=OFF \
-        -DBUILD_ZLIB:BOOL=ON \
+        -DBUILD_ZLIB:BOOL=OFF \
         -DWITH_1394:BOOL=OFF \
         -DWITH_ADE:BOOL=OFF \
         -DWITH_ARAVIS:BOOL=OFF \
@@ -395,6 +417,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DWITH_WEBP:BOOL=OFF \
         -DWITH_XIMEA:BOOL=OFF \
         -DWITH_XINE:BOOL=OFF \
+        -DZLIB_INCLUDE_DIR=$BUILD_DIR/include \
+        -DZLIB_LIBRARY_RELEASE=$BUILD_DIR/lib/libz.a \
         .. \
     && ninja \
     && ninja install \
@@ -519,7 +543,9 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DWITH_CPP_NAMESPACE=ON \
         -DLIBSBML_SKIP_SHARED_LIBRARY=ON \
         -DWITH_BZIP2=OFF \
-        -DWITH_ZLIB=OFF \
+        -DWITH_ZLIB=ON \
+        -DLIBZ_INCLUDE_DIR=$BUILD_DIR/include \
+        -DLIBZ_LIBRARY=$BUILD_DIR/lib/libz.a \
         -DWITH_SWIG=OFF \
         -DWITH_LIBXML=OFF \
         -DWITH_EXPAT=ON \

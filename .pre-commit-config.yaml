@@ -12,7 +12,7 @@ repos:
       - id: prettier
 
   - repo: https://github.com/AleksaC/hadolint-py
-    rev: v2.7.0
+    rev: v2.8.0
     hooks:
       - id: hadolint
         args: [--ignore, DL3003]

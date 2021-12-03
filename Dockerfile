@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-10-11-14ac00e as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2021-11-28-06a91ec as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -200,21 +200,27 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG TBB_VERSION="v2020.3"
+ARG TBB_VERSION="v2021.4.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $TBB_VERSION \
         --depth=1 \
         https://github.com/intel/tbb.git \
     && cd tbb \
-    && make tbb \
-        stdver=c++17 \
-        extra_inc=big_iron.inc \
-        -j$NPROCS \
-    && mkdir -p $BUILD_DIR/lib \
-    && cp build/*_release/*.a $BUILD_DIR/lib \
-    && mkdir -p $BUILD_DIR/include \
-    && cp -r include/tbb $BUILD_DIR/include/. \
+    && mkdir cmake-build \
+    && cd cmake-build \
+    && cmake \
+        -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        -DTBB_STRICT=OFF \
+        -DTBB_TEST=OFF \
+        .. \
+    && ninja \
+    && ninja install \
     && rm -rf $TMP_DIR
 
 ARG MUPARSER_VERSION="v2.3.2"
@@ -242,7 +248,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.2.0"
+ARG QT_VERSION="v6.2.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \
@@ -556,7 +562,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-10-11-14ac00e
+FROM quay.io/pypa/manylinux2010_x86_64:2021-11-28-06a91ec
 
 ARG BUILD_DIR=/opt/smelibs
 

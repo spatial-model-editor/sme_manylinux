@@ -16,3 +16,5 @@ repos:
     hooks:
       - id: hadolint
         args: [--ignore, DL3003]
+ci:
+  autoupdate_schedule: quarterly

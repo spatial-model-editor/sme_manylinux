@@ -1,6 +1,6 @@
 # manylinux2010-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-11-28-06a91ec as builder
+FROM quay.io/pypa/manylinux2010_x86_64:2022-01-30-4e8ddf1 as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -9,7 +9,7 @@ ARG TMP_DIR=/opt/tmpwd
 RUN /opt/python/cp39-cp39/bin/pip install ninja \
     && ln -fs /opt/python/cp39-cp39/bin/ninja /usr/bin/ninja
 
-ARG CEREAL_VERSION="master"
+ARG CEREAL_VERSION="v1.3.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CEREAL_VERSION \
@@ -65,18 +65,19 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.77.0"
-ARG BOOST_VERSION_="1_77_0"
+ARG BOOST_VERSION="1.78.0"
+ARG BOOST_VERSION_="1_78_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
         --output boost.tar.bz2 \
     && tar xjf boost.tar.bz2 \
     && cd boost_${BOOST_VERSION_} \
-    && cp -r boost $BUILD_DIR/include/. \
+    && ./bootstrap.sh --prefix="$BUILD_DIR" --with-libraries=serialization \
+    && ./b2 link=static install \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v5.3"
+ARG CGAL_VERSION="v5.3.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -97,7 +98,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBEXPAT_VERSION="R_2_4_1"
+ARG LIBEXPAT_VERSION="R_2_4_4"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBEXPAT_VERSION \
@@ -223,6 +224,29 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
+ARG PAGMO_VERSION="v2.18.0"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        -b $PAGMO_VERSION \
+        --depth=1 \
+        https://github.com/esa/pagmo2.git \
+    && cd pagmo2 \
+    && mkdir cmake-build \
+    && cd cmake-build \
+    && cmake \
+        -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        -DPAGMO_BUILD_STATIC_LIBRARY=ON \
+        -DPAGMO_BUILD_TESTS=OFF \
+        .. \
+    && ninja \
+    && ninja install \
+    && rm -rf $TMP_DIR
+
 ARG MUPARSER_VERSION="v2.3.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
@@ -305,7 +329,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG OPENCV_VERSION="4.5.4"
+ARG OPENCV_VERSION="4.5.5"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $OPENCV_VERSION \
@@ -430,7 +454,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG FMT_VERSION="8.0.1"
+ARG FMT_VERSION="8.1.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FMT_VERSION \
@@ -529,7 +553,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && bash .ci/install "$PWD"/dune-copasi.opts \
     && rm -rf $TMP_DIR
 
-ARG LIBSBML_VERSION="v5.19.0"
+ARG LIBSBML_VERSION="v5.19.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBSBML_VERSION \
@@ -562,7 +586,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2021-11-28-06a91ec
+FROM quay.io/pypa/manylinux2010_x86_64:2022-01-30-4e8ddf1
 
 ARG BUILD_DIR=/opt/smelibs
 

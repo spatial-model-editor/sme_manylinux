@@ -272,7 +272,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.2.1"
+ARG QT_VERSION="v6.2.3"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \

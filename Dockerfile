@@ -1,6 +1,6 @@
-# manylinux2010-based image for compiling Spatial Model Editor python wheels
+# manylinux2014-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2010_x86_64:2022-01-30-4e8ddf1 as builder
+FROM quay.io/pypa/manylinux2014_x86_64:2022-02-01-8db5ff9 as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -201,7 +201,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG TBB_VERSION="v2021.4.0"
+ARG TBB_VERSION="v2021.5.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $TBB_VERSION \
@@ -586,13 +586,13 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2010_x86_64:2022-01-30-4e8ddf1
+FROM quay.io/pypa/manylinux2014_x86_64:2022-02-01-8db5ff9
 
 ARG BUILD_DIR=/opt/smelibs
 
 # Install ccache
 RUN yum install -q -y \
-        ccache-3.1.6 \
+        ccache-3.7.7 \
     && yum clean all
 
 # Setup ccache

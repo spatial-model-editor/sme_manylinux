@@ -587,6 +587,29 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
+ARG CATCH2_VERSION="v3.0.0-preview4"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        -b $CATCH2_VERSION \
+        --depth=1 \
+        https://github.com/catchorg/Catch2.git \
+    && cd Catch2 \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        -DCATCH_INSTALL_DOCS=OFF \
+        -DCATCH_INSTALL_EXTRAS=ON \
+        .. \
+    && ninja \
+    && ninja install \
+    && rm -rf $TMP_DIR
+
 FROM quay.io/pypa/manylinux2014_x86_64:2022-02-06-28e8f4e
 
 ARG BUILD_DIR=/opt/smelibs

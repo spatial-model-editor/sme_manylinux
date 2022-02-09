@@ -1,6 +1,6 @@
 # manylinux2014-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-02-01-8db5ff9 as builder
+FROM quay.io/pypa/manylinux2014_x86_64:2022-02-06-28e8f4e as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -528,7 +528,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_PREFIX_PATH=$BUILD_DIR \
         -DWITH_LLVM=ON \
         -DWITH_COTIRE=OFF \
-        -DWITH_SYMENGINE_THREAD_SAFE=OFF \
+        -DWITH_SYMENGINE_THREAD_SAFE=ON \
         .. \
     && ninja \
     && ninja test \
@@ -553,7 +553,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && bash .ci/install "$PWD"/dune-copasi.opts \
     && rm -rf $TMP_DIR
 
-ARG LIBSBML_VERSION="v5.19.2"
+ARG LIBSBML_VERSION="development"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBSBML_VERSION \
@@ -571,6 +571,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DENABLE_SPATIAL=ON \
         -DWITH_CPP_NAMESPACE=ON \
+        -DWITH_THREADSAFE_PARSER=ON \
         -DLIBSBML_SKIP_SHARED_LIBRARY=ON \
         -DWITH_BZIP2=OFF \
         -DWITH_ZLIB=ON \
@@ -586,7 +587,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-02-01-8db5ff9
+FROM quay.io/pypa/manylinux2014_x86_64:2022-02-06-28e8f4e
 
 ARG BUILD_DIR=/opt/smelibs
 

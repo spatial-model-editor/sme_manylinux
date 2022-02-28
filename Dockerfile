@@ -1,6 +1,6 @@
 # manylinux2014-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-02-06-28e8f4e as builder
+FROM quay.io/pypa/manylinux2014_x86_64:2022-02-27-769bdbd as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -9,7 +9,7 @@ ARG TMP_DIR=/opt/tmpwd
 RUN /opt/python/cp39-cp39/bin/pip install ninja \
     && ln -fs /opt/python/cp39-cp39/bin/ninja /usr/bin/ninja
 
-ARG CEREAL_VERSION="v1.3.1"
+ARG CEREAL_VERSION="v1.3.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CEREAL_VERSION \
@@ -98,7 +98,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBEXPAT_VERSION="R_2_4_4"
+ARG LIBEXPAT_VERSION="R_2_4_6"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBEXPAT_VERSION \
@@ -506,7 +506,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SYMENGINE_VERSION="master"
+ARG SYMENGINE_VERSION="v0.9.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SYMENGINE_VERSION \
@@ -528,6 +528,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_PREFIX_PATH=$BUILD_DIR \
         -DWITH_LLVM=ON \
         -DWITH_COTIRE=OFF \
+        -DWITH_SYSTEM_CEREAL=ON \
         -DWITH_SYMENGINE_THREAD_SAFE=ON \
         .. \
     && ninja \
@@ -610,7 +611,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-02-06-28e8f4e
+FROM quay.io/pypa/manylinux2014_x86_64:2022-02-27-769bdbd
 
 ARG BUILD_DIR=/opt/smelibs
 

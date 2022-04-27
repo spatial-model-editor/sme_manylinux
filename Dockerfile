@@ -554,12 +554,12 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && bash .ci/install "$PWD"/dune-copasi.opts \
     && rm -rf $TMP_DIR
 
-ARG LIBSBML_VERSION="development"
+ARG LIBSBML_VERSION="fix_219_cmake_missing_config_dependencies"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBSBML_VERSION \
         --depth=1 \
-        https://github.com/sbmlteam/libsbml.git \
+        https://github.com/lkeegan/libsbml.git \
     && cd libsbml \
     && mkdir build \
     && cd build \

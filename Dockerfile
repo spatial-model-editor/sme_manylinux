@@ -1,6 +1,6 @@
 # manylinux2014-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-04-03-da6ecb3 as builder
+FROM quay.io/pypa/manylinux2014_x86_64:2022-04-24-d28e73e as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -570,6 +570,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
         -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        -DCMAKE_PREFIX_PATH=$BUILD_DIR \
         -DENABLE_SPATIAL=ON \
         -DWITH_CPP_NAMESPACE=ON \
         -DWITH_THREADSAFE_PARSER=ON \
@@ -588,7 +589,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.0.0-preview4"
+ARG CATCH2_VERSION="v3.0.0-preview5"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \
@@ -611,7 +612,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-04-03-da6ecb3
+FROM quay.io/pypa/manylinux2014_x86_64:2022-04-24-d28e73e
 
 ARG BUILD_DIR=/opt/smelibs
 

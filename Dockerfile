@@ -28,7 +28,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
 
 ARG GMP_VERSION="6.2.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
-    && curl \
+    && curl -L \
         https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.bz2 \
         --output gmp.tar.bz2 \
     && tar xjf gmp.tar.bz2 \
@@ -159,7 +159,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="14.0.1"
+ARG LLVM_VERSION="14.0.3"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -327,6 +327,17 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp libz.a $BUILD_DIR/lib/libz.a \
     && cp zconf.h $BUILD_DIR/include/. \
     && cp ../zlib.h $BUILD_DIR/include/. \
+    && rm -rf $TMP_DIR
+
+ARG BZIP2_VERSION="1.0.8"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && curl -L \
+        https://sourceware.org/pub/bzip2/bzip2-${BZIP2_VERSION}.tar.gz \
+        --output bzip2.tar.gz \
+    && tar xf bzip2.tar.gz \
+    && cd bzip2-${BZIP2_VERSION} \
+    && make CFLAGS="-O2 -g -D_FILE_OFFSET_BITS=64 -fPIC" -j$NPROCS \
+    && make install PREFIX="$BUILD_DIR" \
     && rm -rf $TMP_DIR
 
 ARG OPENCV_VERSION="4.5.5"
@@ -554,12 +565,12 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && bash .ci/install "$PWD"/dune-copasi.opts \
     && rm -rf $TMP_DIR
 
-ARG LIBSBML_VERSION="fix_219_cmake_missing_config_dependencies"
+ARG LIBSBML_VERSION="development"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBSBML_VERSION \
         --depth=1 \
-        https://github.com/lkeegan/libsbml.git \
+        https://github.com/sbmlteam/libsbml.git \
     && cd libsbml \
     && mkdir build \
     && cd build \
@@ -575,15 +586,17 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DWITH_CPP_NAMESPACE=ON \
         -DWITH_THREADSAFE_PARSER=ON \
         -DLIBSBML_SKIP_SHARED_LIBRARY=ON \
-        -DWITH_BZIP2=OFF \
+        -DWITH_BZIP2=ON \
+        -DLIBBZ_INCLUDE_DIR=$BUILD_DIR/include \
+        -DLIBBZ_LIBRARY=$BUILD_DIR/lib/libbz2.a \
         -DWITH_ZLIB=ON \
         -DLIBZ_INCLUDE_DIR=$BUILD_DIR/include \
         -DLIBZ_LIBRARY=$BUILD_DIR/lib/libz.a \
         -DWITH_SWIG=OFF \
         -DWITH_LIBXML=OFF \
         -DWITH_EXPAT=ON \
-        -DLIBEXPAT_INCLUDE_DIR=$BUILD_DIR/include \
-        -DLIBEXPAT_LIBRARY=$BUILD_DIR/lib64/libexpat.a \
+        -DEXPAT_INCLUDE_DIR=$BUILD_DIR/include \
+        -DEXPAT_LIBRARY=$BUILD_DIR/lib64/libexpat.a \
         .. \
     && ninja \
     && ninja install \

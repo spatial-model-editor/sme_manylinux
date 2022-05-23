@@ -1,6 +1,6 @@
 # manylinux2014-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-04-24-d28e73e as builder
+FROM quay.io/pypa/manylinux2014_x86_64:2022-05-22-fbe07ea as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -65,8 +65,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.78.0"
-ARG BOOST_VERSION_="1_78_0"
+ARG BOOST_VERSION="1.79.0"
+ARG BOOST_VERSION_="1_79_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
@@ -217,6 +217,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
         -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        -DTBB_ENABLE_IPO=ON \
         -DTBB_STRICT=OFF \
         -DTBB_TEST=OFF \
         .. \
@@ -602,7 +603,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.0.0-preview5"
+ARG CATCH2_VERSION="v3.0.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \
@@ -625,7 +626,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-04-24-d28e73e
+FROM quay.io/pypa/manylinux2014_x86_64:2022-05-22-fbe07ea
 
 ARG BUILD_DIR=/opt/smelibs
 

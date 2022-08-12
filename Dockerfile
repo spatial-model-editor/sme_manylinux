@@ -1,6 +1,6 @@
 # manylinux2014-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-05-22-fbe07ea as builder
+FROM quay.io/pypa/manylinux2014_x86_64:2022-08-09-51a01be as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -77,7 +77,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ./b2 link=static install \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v5.3.1"
+ARG CGAL_VERSION="v5.5"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -124,7 +124,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBTIFF_VERSION="v4.3.0"
+ARG LIBTIFF_VERSION="v4.4.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBTIFF_VERSION \
@@ -159,7 +159,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="14.0.3"
+ARG LLVM_VERSION="14.0.6"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -273,41 +273,6 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.2.4"
-RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
-    && git clone \
-        https://code.qt.io/qt/qt5.git \
-    && cd qt5 \
-    && git checkout $QT_VERSION \
-    && git submodule update --init qtbase \
-    && cd .. \
-    && mkdir build \
-    && cd build \
-    && cmake ../qt5/qtbase \
-        -GNinja \
-        -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
-        -DFEATURE_system_doubleconversion=OFF \
-        -DFEATURE_system_harfbuzz=OFF \
-        -DFEATURE_system_jpeg=OFF \
-        -DFEATURE_system_libb2=OFF \
-        -DFEATURE_system_pcre2=OFF \
-        -DFEATURE_system_png=OFF \
-        -DFEATURE_system_proxies=OFF \
-        -DFEATURE_system_textmarkdownreader=OFF \
-        -DFEATURE_system_zlib=OFF \
-        -DFEATURE_zstd=OFF \
-        -DFEATURE_openssl=OFF \
-        -DFEATURE_sql=OFF \
-        -DFEATURE_icu=OFF \
-        -DFEATURE_testlib=ON \
-        -DBUILD_WITH_PCH=OFF \
-        -DFEATURE_xcb=OFF \
-    && ninja \
-    && ninja install \
-    && rm -rf $TMP_DIR
-
 ARG ZLIB_VERSION="v1.2.11"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
@@ -330,6 +295,43 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
+ARG QT_VERSION="v6.3.1"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        https://code.qt.io/qt/qt5.git \
+    && cd qt5 \
+    && git checkout $QT_VERSION \
+    && git submodule update --init qtbase \
+    && cd .. \
+    && mkdir build \
+    && cd build \
+    && cmake ../qt5/qtbase \
+        -GNinja \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
+        -DFEATURE_system_doubleconversion=OFF \
+        -DFEATURE_system_harfbuzz=OFF \
+        -DFEATURE_system_jpeg=OFF \
+        -DFEATURE_system_libb2=OFF \
+        -DFEATURE_system_pcre2=OFF \
+        -DFEATURE_system_png=OFF \
+        -DFEATURE_system_proxies=OFF \
+        -DFEATURE_system_textmarkdownreader=OFF \
+        -DFEATURE_system_zlib=ON \
+        -DZLIB_INCLUDE_DIR=${BUILD_DIR}/include \
+        -DZLIB_LIBRARY_RELEASE=${BUILD_DIR}/lib/libz.a \
+        -DFEATURE_zstd=OFF \
+        -DFEATURE_openssl=OFF \
+        -DFEATURE_sql=OFF \
+        -DFEATURE_icu=OFF \
+        -DFEATURE_testlib=ON \
+        -DBUILD_WITH_PCH=OFF \
+        -DFEATURE_xcb=OFF \
+    && ninja \
+    && ninja install \
+    && rm -rf $TMP_DIR
+
 ARG BZIP2_VERSION="1.0.8"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
@@ -341,7 +343,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install PREFIX="$BUILD_DIR" \
     && rm -rf $TMP_DIR
 
-ARG OPENCV_VERSION="4.5.5"
+ARG OPENCV_VERSION="4.6.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $OPENCV_VERSION \
@@ -603,7 +605,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.0.1"
+ARG CATCH2_VERSION="v3.1.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \
@@ -626,7 +628,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-05-22-fbe07ea
+FROM quay.io/pypa/manylinux2014_x86_64:2022-08-09-51a01be
 
 ARG BUILD_DIR=/opt/smelibs
 

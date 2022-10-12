@@ -1,6 +1,6 @@
 # manylinux2014-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-09-18-2b8b451 as builder
+FROM quay.io/pypa/manylinux2014_x86_64:2022-10-12-b8b6ebc as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -605,6 +605,39 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
+ARG COMBINE_VERSION="master"
+ARG ZIPPER_VERSION="master"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        -b $COMBINE_VERSION \
+        --depth=1 \
+        https://github.com/sbmlteam/libCombine.git \
+    && cd libCombine \
+    && git submodule update --init submodules/zipper \
+    && cd submodules/zipper \
+    && git checkout $ZIPPER_VERSION \
+    && cd ../../ \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        -DCMAKE_PREFIX_PATH="$BUILD_DIR;$BUILD_DIR/lib/cmake" \
+        -DLIBCOMBINE_SKIP_SHARED_LIBRARY=ON \
+        -DEXTRA_LIBS="$BUILD_DIR/lib/libz.a;$BUILD_DIR/lib/libbz2.a;$BUILD_DIR/lib64/libexpat.a" \
+        -DWITH_CPP_NAMESPACE=ON \
+        -DZLIB_INCLUDE_DIR=$BUILD_DIR/include \
+        -DZLIB_LIBRARY=$BUILD_DIR/lib/libz.a \
+        .. \
+    && ninja \
+    && ninja test \
+    && ninja install \
+    && rm -rf $TMP_DIR
+
 ARG CATCH2_VERSION="v3.1.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
@@ -628,7 +661,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-09-18-2b8b451
+FROM quay.io/pypa/manylinux2014_x86_64:2022-10-12-b8b6ebc
 
 ARG BUILD_DIR=/opt/smelibs
 

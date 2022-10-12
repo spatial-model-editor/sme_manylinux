@@ -1,6 +1,6 @@
 # manylinux2014-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-10-12-b8b6ebc as builder
+FROM quay.io/pypa/manylinux2014_x86_64:2022-11-19-1b19e81 as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -45,7 +45,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG MPFR_VERSION="4.1.0"
+ARG MPFR_VERSION="4.1.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl \
         https://www.mpfr.org/mpfr-current/mpfr-${MPFR_VERSION}.tar.bz2 \
@@ -77,7 +77,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ./b2 link=static install \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v5.5"
+ARG CGAL_VERSION="v5.5.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -98,7 +98,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBEXPAT_VERSION="R_2_4_9"
+ARG LIBEXPAT_VERSION="R_2_5_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBEXPAT_VERSION \
@@ -159,7 +159,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="15.0.1"
+ARG LLVM_VERSION="15.0.4"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -201,7 +201,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG TBB_VERSION="v2021.5.0"
+ARG TBB_VERSION="v2021.7.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $TBB_VERSION \
@@ -295,7 +295,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.3.2"
+ARG QT_VERSION="v6.4.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \
@@ -492,7 +492,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="v1.10.0"
+ARG SPDLOG_VERSION="v1.11.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \
@@ -638,7 +638,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.1.0"
+ARG CATCH2_VERSION="v3.2.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \
@@ -661,7 +661,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-10-12-b8b6ebc
+FROM quay.io/pypa/manylinux2014_x86_64:2022-11-19-1b19e81
 
 ARG BUILD_DIR=/opt/smelibs
 

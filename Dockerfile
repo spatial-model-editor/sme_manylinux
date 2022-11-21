@@ -48,7 +48,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
 ARG MPFR_VERSION="4.1.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl \
-        https://www.mpfr.org/mpfr-current/mpfr-${MPFR_VERSION}.tar.bz2 \
+        https://www.mpfr.org/mpfr-${MPFR_VERSION}/mpfr-${MPFR_VERSION}.tar.bz2 \
         --output mpfr.tar.bz2 \
     && tar xjf mpfr.tar.bz2 \
     && cd mpfr-${MPFR_VERSION} \

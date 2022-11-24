@@ -45,7 +45,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG MPFR_VERSION="4.1.1"
+ARG MPFR_VERSION="4.1.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl \
         https://www.mpfr.org/mpfr-current/mpfr-${MPFR_VERSION}.tar.bz2 \

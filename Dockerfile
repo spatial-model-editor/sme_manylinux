@@ -1,6 +1,6 @@
 # manylinux2014-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-12-11-145d107 as builder
+FROM quay.io/pypa/manylinux2014_x86_64:2023-05-22-26d8346 as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -45,7 +45,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG MPFR_VERSION="4.1.0"
+ARG MPFR_VERSION="4.2.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl \
         https://www.mpfr.org/mpfr-${MPFR_VERSION}/mpfr-${MPFR_VERSION}.tar.bz2 \
@@ -65,8 +65,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.80.0"
-ARG BOOST_VERSION_="1_80_0"
+ARG BOOST_VERSION="1.81.0"
+ARG BOOST_VERSION_="1_81_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
@@ -77,7 +77,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ./b2 link=static install \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v5.5.1"
+ARG CGAL_VERSION="v5.5.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -124,7 +124,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBTIFF_VERSION="v4.4.0"
+ARG LIBTIFF_VERSION="v4.5.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBTIFF_VERSION \
@@ -159,7 +159,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="15.0.6"
+ARG LLVM_VERSION="16.0.4"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -202,7 +202,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG TBB_VERSION="v2021.7.0"
+ARG TBB_VERSION="v2021.8.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $TBB_VERSION \
@@ -226,7 +226,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG PAGMO_VERSION="v2.18.0"
+ARG PAGMO_VERSION="v2.19.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $PAGMO_VERSION \
@@ -249,7 +249,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG MUPARSER_VERSION="v2.3.2"
+ARG MUPARSER_VERSION="v2.3.4"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $MUPARSER_VERSION \
@@ -274,7 +274,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG ZLIB_VERSION="v1.2.11"
+ARG ZLIB_VERSION="v1.2.13"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $ZLIB_VERSION \
@@ -296,7 +296,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.4.0"
+ARG QT_VERSION="v6.4.3"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \
@@ -344,7 +344,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install PREFIX="$BUILD_DIR" \
     && rm -rf $TMP_DIR
 
-ARG OPENCV_VERSION="4.6.0"
+ARG OPENCV_VERSION="4.7.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $OPENCV_VERSION \
@@ -521,7 +521,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SYMENGINE_VERSION="master"
+ARG SYMENGINE_VERSION="v0.10.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SYMENGINE_VERSION \
@@ -569,7 +569,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && bash .ci/install "$PWD"/dune-copasi.opts \
     && rm -rf $TMP_DIR
 
-ARG LIBSBML_VERSION="v5.19.7"
+ARG LIBSBML_VERSION="development"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBSBML_VERSION \
@@ -639,7 +639,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.2.0"
+ARG CATCH2_VERSION="v3.3.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \
@@ -662,7 +662,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2014_x86_64:2022-12-11-145d107
+FROM quay.io/pypa/manylinux2014_x86_64:2023-05-22-26d8346
 
 ARG BUILD_DIR=/opt/smelibs
 

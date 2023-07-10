@@ -1,13 +1,13 @@
-# manylinux2014-based image for compiling Spatial Model Editor python wheels
+# manylinux_2_28_x86_64-based image for compiling Spatial Model Editor python wheels
 
-FROM quay.io/pypa/manylinux2014_x86_64:2023-05-22-26d8346 as builder
+FROM quay.io/pypa/manylinux_2_28_x86_64:2023-11-07-de0c444 as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
 
-RUN /opt/python/cp39-cp39/bin/pip install ninja \
-    && ln -fs /opt/python/cp39-cp39/bin/ninja /usr/bin/ninja
+RUN /opt/python/cp311-cp311/bin/pip install ninja \
+    && ln -fs /opt/python/cp311-cp311/bin/ninja /usr/bin/ninja
 
 ARG CEREAL_VERSION="v1.3.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
@@ -26,7 +26,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG GMP_VERSION="6.2.1"
+ARG GMP_VERSION="6.3.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.bz2 \
@@ -45,7 +45,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG MPFR_VERSION="4.2.0"
+ARG MPFR_VERSION="4.2.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl \
         https://www.mpfr.org/mpfr-${MPFR_VERSION}/mpfr-${MPFR_VERSION}.tar.bz2 \
@@ -65,8 +65,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.81.0"
-ARG BOOST_VERSION_="1_81_0"
+ARG BOOST_VERSION="1.83.0"
+ARG BOOST_VERSION_="1_83_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
@@ -77,7 +77,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ./b2 link=static install \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v5.5.2"
+ARG CGAL_VERSION="v5.6"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -124,7 +124,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBTIFF_VERSION="v4.5.0"
+ARG LIBTIFF_VERSION="v4.6.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBTIFF_VERSION \
@@ -159,7 +159,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="16.0.4"
+ARG LLVM_VERSION="17.0.4"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -202,13 +202,13 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG TBB_VERSION="v2021.8.0"
+ARG TBB_VERSION="fix_1145_missing_threads_dependency_static_build"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $TBB_VERSION \
         --depth=1 \
-        https://github.com/intel/tbb.git \
-    && cd tbb \
+        https://github.com/lkeegan/oneTBB.git \
+    && cd oneTBB \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake \
@@ -221,6 +221,29 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DTBB_ENABLE_IPO=ON \
         -DTBB_STRICT=OFF \
         -DTBB_TEST=OFF \
+        .. \
+    && ninja \
+    && ninja install \
+    && rm -rf $TMP_DIR
+
+ARG DPL_VERSION="oneDPL-2022.2.0-rc1"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        -b $DPL_VERSION \
+        --depth 1 \
+        https://github.com/oneapi-src/oneDPL.git \
+    && cd oneDPL \
+    && mkdir cmake-build \
+    && cd cmake-build \
+    && cmake \
+        -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        -DCMAKE_PREFIX_PATH=$BUILD_DIR \
+        -DONEDPL_BACKEND="tbb" \
         .. \
     && ninja \
     && ninja install \
@@ -249,31 +272,6 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG MUPARSER_VERSION="v2.3.4"
-RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
-    && git clone \
-        -b $MUPARSER_VERSION \
-        --depth=1 \
-        https://github.com/beltoforion/muparser.git \
-    && cd muparser \
-    && mkdir cmake-build \
-    && cd cmake-build \
-    && cmake \
-        -GNinja \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
-        -DBUILD_TESTING=ON \
-        -DENABLE_OPENMP=OFF \
-        -DENABLE_SAMPLES=OFF \
-        .. \
-    && ninja \
-    && ninja test \
-    && ninja install \
-    && rm -rf $TMP_DIR
-
 ARG ZLIB_VERSION="v1.2.13"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
@@ -296,7 +294,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.4.3"
+ARG QT_VERSION="v6.6.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         https://code.qt.io/qt/qt5.git \
@@ -344,7 +342,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install PREFIX="$BUILD_DIR" \
     && rm -rf $TMP_DIR
 
-ARG OPENCV_VERSION="4.7.0"
+ARG OPENCV_VERSION="4.8.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $OPENCV_VERSION \
@@ -469,7 +467,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG FMT_VERSION="9.1.0"
+ARG FMT_VERSION="10.1.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FMT_VERSION \
@@ -493,7 +491,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="v1.11.0"
+ARG SPDLOG_VERSION="v1.12.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \
@@ -521,7 +519,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SYMENGINE_VERSION="v0.10.1"
+ARG SYMENGINE_VERSION="v0.11.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SYMENGINE_VERSION \
@@ -551,14 +549,19 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG DUNE_COPASI_VERSION="releases/1.1"
+ARG DUNE_COPASI_VERSION="ci_fixes_for_dune_copasi_2_xcode"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export DUNE_COPASI_USE_STATIC_DEPS=ON \
     && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \
     && export MAKE_FLAGS="-j$NPROCS VERBOSE=1" \
     && export DUNE_USE_FALLBACK_FILESYSTEM=ON \
-    && export CMAKE_CXX_FLAGS="-fvisibility=hidden" \
+    && export CMAKE_CXX_FLAGS="'-fvisibility=hidden -D_GLIBCXX_USE_TBB_PAR_BACKEND=0'" \
     && export CMAKE_FLAGS="-GNinja" \
+    && export CMAKE_DISABLE_FIND_PACKAGE_MPI=ON \
+    && export DUNE_ENABLE_PYTHONBINDINGS=OFF \
+    && export DUNE_PDELAB_ENABLE_TRACING=OFF \
+    && export DUNE_COPASI_DISABLE_FETCH_PACKAGE_ExprTk=ON \
+    && export DUNE_COPASI_DISABLE_FETCH_PACKAGE_parafields=ON \
     && git clone \
         -b $DUNE_COPASI_VERSION \
         --depth 1 \
@@ -639,7 +642,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.3.2"
+ARG CATCH2_VERSION="v3.4.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \
@@ -662,19 +665,9 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux2014_x86_64:2023-05-22-26d8346
+FROM quay.io/pypa/manylinux_2_28_x86_64:2023-11-07-de0c444
 
 ARG BUILD_DIR=/opt/smelibs
-
-# Install ccache
-RUN yum install -q -y \
-        ccache-3.7.7 \
-    && yum clean all
-
-# Setup ccache
-ENV CCACHE_DIR=/tmp/ccache
-ENV CCACHE_BASEDIR=/tmp
-ENV CMAKE_CXX_COMPILER_LAUNCHER="ccache"
 
 # SME static libs
 COPY --from=builder $BUILD_DIR $BUILD_DIR

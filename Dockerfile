@@ -26,6 +26,24 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
+ARG FUNCTION2_VERSION="4.2.4"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        -b $FUNCTION2_VERSION \
+        --depth=1 \
+        https://github.com/Naios/function2.git \
+    && cd function2 \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_TESTING=OFF \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        .. \
+    && ninja install \
+    && rm -rf $TMP_DIR
+
 ARG GMP_VERSION="6.3.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
@@ -253,7 +271,7 @@ ARG PAGMO_VERSION="v2.19.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $PAGMO_VERSION \
-        --depth=1 \
+        --depth 1 \
         https://github.com/esa/pagmo2.git \
     && cd pagmo2 \
     && mkdir cmake-build \
@@ -276,7 +294,7 @@ ARG ZLIB_VERSION="v1.2.13"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $ZLIB_VERSION \
-        --depth=1 \
+        --depth 1 \
         https://github.com/madler/zlib.git \
     && cd zlib \
     && mkdir build \
@@ -297,10 +315,11 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
 ARG QT_VERSION="v6.6.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
+        -b $QT_VERSION \
+        --depth 1 \
         https://code.qt.io/qt/qt5.git \
     && cd qt5 \
-    && git checkout $QT_VERSION \
-    && git submodule update --init qtbase \
+    && git submodule update --depth 1 --init qtbase \
     && cd .. \
     && mkdir build \
     && cd build \

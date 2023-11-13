@@ -1,6 +1,8 @@
-# manylinux_2_28_x86_64-based image for compiling Spatial Model Editor python wheels
-
 FROM quay.io/pypa/manylinux_2_28_x86_64:2023-11-07-de0c444 as builder
+
+LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux2014_x86_64
+LABEL org.opencontainers.image.description="manylinux_2_28_x86_64-based image for compiling Spatial Model Editor python wheels"
+LABEL org.opencontainers.image.licenses=MIT
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs

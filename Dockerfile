@@ -540,7 +540,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SYMENGINE_VERSION="v0.11.1"
+ARG SYMENGINE_VERSION="master"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SYMENGINE_VERSION \
@@ -570,7 +570,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG DUNE_COPASI_VERSION="ci_fixes_for_dune_copasi_2_xcode"
+ARG DUNE_COPASI_VERSION="master"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export DUNE_COPASI_USE_STATIC_DEPS=ON \
     && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \

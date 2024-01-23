@@ -1,4 +1,4 @@
-FROM quay.io/pypa/manylinux_2_28_x86_64:2023-11-07-de0c444 as builder
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-01-23-12ffabc as builder
 
 LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux2014_x86_64
 LABEL org.opencontainers.image.description="manylinux_2_28_x86_64-based image for compiling Spatial Model Editor python wheels"
@@ -10,6 +10,10 @@ ARG TMP_DIR=/opt/tmpwd
 
 RUN /opt/python/cp311-cp311/bin/pip install ninja \
     && ln -fs /opt/python/cp311-cp311/bin/ninja /usr/bin/ninja
+
+RUN yum update \
+    && yum install -y flex-2.6.1 \
+    && yum clean all
 
 ARG CEREAL_VERSION="v1.3.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
@@ -85,8 +89,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.83.0"
-ARG BOOST_VERSION_="1_83_0"
+ARG BOOST_VERSION="1.84.0"
+ARG BOOST_VERSION_="1_84_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
@@ -179,7 +183,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="17.0.4"
+ARG LLVM_VERSION="17.0.6"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -192,7 +196,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
-        -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp39-cp39/bin/python \
+        -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp311-cp311/bin/python \
         -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-linux-gnu \
         -DLLVM_TARGETS_TO_BUILD="X86" \
         -DLLVM_BUILD_TOOLS=OFF \
@@ -314,7 +318,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.6.0"
+ARG QT_VERSION="v6.6.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $QT_VERSION \
@@ -363,7 +367,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install PREFIX="$BUILD_DIR" \
     && rm -rf $TMP_DIR
 
-ARG OPENCV_VERSION="4.8.1"
+ARG OPENCV_VERSION="4.9.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $OPENCV_VERSION \
@@ -488,7 +492,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG FMT_VERSION="10.1.1"
+ARG FMT_VERSION="10.2.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FMT_VERSION \
@@ -570,6 +574,37 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
+ARG SCOTCH_VERSION="v7.0.4"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        -b $SCOTCH_VERSION \
+        --depth=1 \
+        https://gitlab.inria.fr/scotch/scotch.git \
+    && cd scotch \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        -DBUILD_PTSCOTCH=OFF \
+        -DBUILD_LIBESMUMPS=OFF \
+        -DUSE_LZMA=OFF \
+        -DUSE_ZLIB=ON \
+        -DZLIB_INCLUDE_DIR=${BUILD_DIR}/include \
+        -DZLIB_LIBRARY_RELEASE=${BUILD_DIR}/lib/libz.a \
+        -DUSE_BZ2=ON \
+        -DBZIP2_INCLUDE_DIR=${BUILD_DIR}/include \
+        -DBZIP2_LIBRARY_RELEASE=${BUILD_DIR}/lib/libbz2.a \
+        .. \
+    && ninja \
+    && ninja test \
+    && ninja install \
+    && rm -rf $TMP_DIR
+
 ARG DUNE_COPASI_VERSION="master"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export DUNE_COPASI_USE_STATIC_DEPS=ON \
@@ -591,6 +626,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && bash dune-copasi.opts \
     && bash .ci/setup_dune "$PWD"/dune-copasi.opts \
     && bash .ci/install "$PWD"/dune-copasi.opts \
+    && bash .ci/test "$PWD"/dune-copasi.opts \
     && rm -rf $TMP_DIR
 
 ARG LIBSBML_VERSION="development"
@@ -663,7 +699,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.4.0"
+ARG CATCH2_VERSION="v3.5.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \
@@ -686,7 +722,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux_2_28_x86_64:2023-11-07-de0c444
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-01-23-12ffabc
 
 ARG BUILD_DIR=/opt/smelibs
 

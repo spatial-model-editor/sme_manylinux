@@ -1,4 +1,4 @@
-FROM quay.io/pypa/manylinux_2_28_x86_64:2024-01-23-12ffabc as builder
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-01-29-1785b0b as builder
 
 LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux2014_x86_64
 LABEL org.opencontainers.image.description="manylinux_2_28_x86_64-based image for compiling Spatial Model Editor python wheels"
@@ -618,6 +618,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export DUNE_PDELAB_ENABLE_TRACING=OFF \
     && export DUNE_COPASI_DISABLE_FETCH_PACKAGE_ExprTk=ON \
     && export DUNE_COPASI_DISABLE_FETCH_PACKAGE_parafields=ON \
+    && export DUNE_COPASI_GRID_DIMENSIONS='"2;3"' \
     && git clone \
         -b $DUNE_COPASI_VERSION \
         --depth 1 \
@@ -722,7 +723,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux_2_28_x86_64:2024-01-23-12ffabc
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-01-29-1785b0b
 
 ARG BUILD_DIR=/opt/smelibs
 

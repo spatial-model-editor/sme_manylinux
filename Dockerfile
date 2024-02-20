@@ -726,7 +726,19 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
 FROM quay.io/pypa/manylinux_2_28_x86_64:2024-01-29-1785b0b
 
 ARG BUILD_DIR=/opt/smelibs
+ARG TMP_DIR=/opt/tmpwd
+
+ARG CCACHE_VERSION="4.9.1"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && curl \
+        -L https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-x86_64.tar.xz \
+        --output ccache.tar.xz \
+    && tar xJf ccache.tar.xz \
+    && cd ccache-${CCACHE_VERSION}-linux-x86_64 \
+    && make install \
+    && rm -rf $TMP_DIR
 
 # SME static libs
 COPY --from=builder $BUILD_DIR $BUILD_DIR
 ENV CMAKE_PREFIX_PATH="$BUILD_DIR;$BUILD_DIR/lib64/cmake"
+ENV CCACHE_DIR=/host/opt/ccache

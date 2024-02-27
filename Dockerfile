@@ -1,7 +1,7 @@
-FROM quay.io/pypa/manylinux_2_28_x86_64:2024-01-29-1785b0b as builder
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-02-16-b3cad8f as builder
 
-LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux2014_x86_64
-LABEL org.opencontainers.image.description="manylinux_2_28_x86_64-based image for compiling Spatial Model Editor python wheels"
+LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux_x86_64
+LABEL org.opencontainers.image.description="manylinux x86_64 image for compiling Spatial Model Editor python wheels"
 LABEL org.opencontainers.image.licenses=MIT
 
 ARG NPROCS=24
@@ -611,7 +611,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \
     && export MAKE_FLAGS="-j$NPROCS VERBOSE=1" \
     && export DUNE_USE_FALLBACK_FILESYSTEM=ON \
-    && export CMAKE_CXX_FLAGS="'-fvisibility=hidden -D_GLIBCXX_USE_TBB_PAR_BACKEND=0'" \
+    && export CMAKE_CXX_FLAGS='"-fvisibility=hidden -D_GLIBCXX_USE_TBB_PAR_BACKEND=0"' \
     && export CMAKE_FLAGS="-GNinja" \
     && export CMAKE_DISABLE_FIND_PACKAGE_MPI=ON \
     && export DUNE_ENABLE_PYTHONBINDINGS=OFF \
@@ -723,7 +723,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux_2_28_x86_64:2024-01-29-1785b0b
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-02-16-b3cad8f
 
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd

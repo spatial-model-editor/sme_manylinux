@@ -1,4 +1,4 @@
-FROM quay.io/pypa/manylinux_2_28_x86_64:2024-02-16-b3cad8f as builder
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-03-25-9206bd9 as builder
 
 LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux_x86_64
 LABEL org.opencontainers.image.description="manylinux x86_64 image for compiling Spatial Model Editor python wheels"
@@ -12,7 +12,7 @@ RUN /opt/python/cp311-cp311/bin/pip install ninja \
     && ln -fs /opt/python/cp311-cp311/bin/ninja /usr/bin/ninja
 
 RUN yum update \
-    && yum install -y flex-2.6.1 \
+    && yum install -y flex-2.6.1 git-lfs-3.2.0 \
     && yum clean all
 
 ARG CEREAL_VERSION="v1.3.2"
@@ -149,12 +149,15 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && rm -rf $TMP_DIR
 
 ARG LIBTIFF_VERSION="v4.6.0"
+# plus patch for cmake CMath issue
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBTIFF_VERSION \
         --depth=1 \
         https://gitlab.com/libtiff/libtiff.git \
     && cd libtiff \
+    && curl -L https://gitlab.com/libtiff/libtiff/-/commit/67f73084ca824e6c2465c47a5b67b16b5beca569.diff --output patch.diff \
+    && git apply --ignore-space-change --ignore-whitespace --verbose patch.diff \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake \
@@ -624,6 +627,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         --depth 1 \
         https://gitlab.dune-project.org/copasi/dune-copasi.git \
     && cd dune-copasi \
+    && git lfs install \
+    && git lfs pull \
     && bash dune-copasi.opts \
     && bash .ci/setup_dune "$PWD"/dune-copasi.opts \
     && bash .ci/install "$PWD"/dune-copasi.opts \
@@ -723,7 +728,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux_2_28_x86_64:2024-02-16-b3cad8f
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-03-25-9206bd9
 
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd

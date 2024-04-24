@@ -1,17 +1,13 @@
-FROM quay.io/pypa/manylinux_2_28_x86_64:2024-03-25-9206bd9 as builder
-
-LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux_x86_64
-LABEL org.opencontainers.image.description="manylinux x86_64 image for compiling Spatial Model Editor python wheels"
-LABEL org.opencontainers.image.licenses=MIT
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-04-23-ef7507e as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
 
-RUN /opt/python/cp311-cp311/bin/pip install ninja \
-    && ln -fs /opt/python/cp311-cp311/bin/ninja /usr/bin/ninja
+RUN /opt/python/cp312-cp312/bin/pip install ninja \
+    && ln -fs /opt/python/cp312-cp312/bin/ninja /usr/bin/ninja
 
-RUN yum update \
+RUN yum update -y \
     && yum install -y flex-2.6.1 git-lfs-3.2.0 \
     && yum clean all
 
@@ -89,8 +85,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.84.0"
-ARG BOOST_VERSION_="1_84_0"
+ARG BOOST_VERSION="1.85.0"
+ARG BOOST_VERSION_="1_85_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
@@ -101,7 +97,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ./b2 link=static install \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v5.6"
+ARG CGAL_VERSION="v5.6.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -122,7 +118,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBEXPAT_VERSION="R_2_5_0"
+ARG LIBEXPAT_VERSION="R_2_6_2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBEXPAT_VERSION \
@@ -186,7 +182,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="17.0.6"
+ARG LLVM_VERSION="18.1.4"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -199,7 +195,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
-        -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp311-cp311/bin/python \
+        -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp312-cp312/bin/python \
         -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-linux-gnu \
         -DLLVM_TARGETS_TO_BUILD="X86" \
         -DLLVM_BUILD_TOOLS=OFF \
@@ -229,12 +225,12 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG TBB_VERSION="fix_1145_missing_threads_dependency_static_build"
+ARG TBB_VERSION="v2021.12.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $TBB_VERSION \
         --depth=1 \
-        https://github.com/lkeegan/oneTBB.git \
+        https://github.com/oneapi-src/oneTBB.git \
     && cd oneTBB \
     && mkdir cmake-build \
     && cd cmake-build \
@@ -253,7 +249,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG DPL_VERSION="oneDPL-2022.2.0-rc1"
+ARG DPL_VERSION="oneDPL-2022.5.0-rc1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $DPL_VERSION \
@@ -321,7 +317,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.6.1"
+ARG QT_VERSION="v6.7.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $QT_VERSION \
@@ -334,8 +330,10 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cd build \
     && cmake ../qt5/qtbase \
         -GNinja \
-        -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
         -DFEATURE_system_doubleconversion=OFF \
         -DFEATURE_system_harfbuzz=OFF \
@@ -519,7 +517,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="v1.12.0"
+ARG SPDLOG_VERSION="v1.13.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \
@@ -612,10 +610,8 @@ ARG DUNE_COPASI_VERSION="master"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export DUNE_COPASI_USE_STATIC_DEPS=ON \
     && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \
-    && export MAKE_FLAGS="-j$NPROCS VERBOSE=1" \
-    && export DUNE_USE_FALLBACK_FILESYSTEM=ON \
+    && export CMAKE_GENERATOR=Ninja \
     && export CMAKE_CXX_FLAGS='"-fvisibility=hidden -D_GLIBCXX_USE_TBB_PAR_BACKEND=0"' \
-    && export CMAKE_FLAGS="-GNinja" \
     && export CMAKE_DISABLE_FIND_PACKAGE_MPI=ON \
     && export DUNE_ENABLE_PYTHONBINDINGS=OFF \
     && export DUNE_PDELAB_ENABLE_TRACING=OFF \
@@ -705,7 +701,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.5.1"
+ARG CATCH2_VERSION="v3.5.4"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \
@@ -728,7 +724,11 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux_2_28_x86_64:2024-03-25-9206bd9
+FROM quay.io/pypa/manylinux_2_28_x86_64:2024-04-23-ef7507e
+
+LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux_x86_64
+LABEL org.opencontainers.image.description="manylinux x86_64 image for compiling Spatial Model Editor python wheels"
+LABEL org.opencontainers.image.licenses=MIT
 
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
@@ -743,7 +743,11 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
+RUN /opt/python/cp312-cp312/bin/pip install ninja \
+    && ln -fs /opt/python/cp312-cp312/bin/ninja /usr/bin/ninja
+
 # SME static libs
 COPY --from=builder $BUILD_DIR $BUILD_DIR
 ENV CMAKE_PREFIX_PATH="$BUILD_DIR;$BUILD_DIR/lib64/cmake"
-ENV CCACHE_DIR=/host/opt/ccache
+# Set ccache dir default to the location used on github CI
+ENV CCACHE_DIR=/host/home/runner/work/sme_manylinux_x86_64/sme_manylinux_x86_64/.cache/ccache

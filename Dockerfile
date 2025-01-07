@@ -1,4 +1,4 @@
-FROM quay.io/pypa/manylinux_2_28_x86_64:2024-09-09-f386546 as builder
+FROM quay.io/pypa/manylinux_2_28_x86_64:2025-01-05-75aeda9 as builder
 
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
@@ -85,11 +85,11 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.86.0"
-ARG BOOST_VERSION_="1_86_0"
+ARG BOOST_VERSION="1.87.0"
+ARG BOOST_VERSION_="1_87_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
-        "https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
+        "https://archives.boost.io/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
         --output boost.tar.bz2 \
     && tar xjf boost.tar.bz2 \
     && cd boost_${BOOST_VERSION_} \
@@ -97,7 +97,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ./b2 link=static install \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v5.6.1"
+ARG CGAL_VERSION="v6.0.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -118,7 +118,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBEXPAT_VERSION="R_2_6_3"
+ARG LIBEXPAT_VERSION="R_2_6_4"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBEXPAT_VERSION \
@@ -144,15 +144,15 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBTIFF_VERSION="v4.6.0"
-# plus patch for cmake CMath issue
+ARG LIBTIFF_VERSION="v4.7.0"
+# includes patch for cmake linking CMath issue from sme_deps_common
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBTIFF_VERSION \
         --depth=1 \
         https://gitlab.com/libtiff/libtiff.git \
     && cd libtiff \
-    && curl -L https://gitlab.com/libtiff/libtiff/-/commit/67f73084ca824e6c2465c47a5b67b16b5beca569.diff --output patch.diff \
+    && curl -L https://raw.githubusercontent.com/spatial-model-editor/sme_deps_common/refs/heads/main/libtiff.diff --output patch.diff \
     && git apply --ignore-space-change --ignore-whitespace --verbose patch.diff \
     && mkdir cmake-build \
     && cd cmake-build \
@@ -182,7 +182,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="18.1.8"
+ARG LLVM_VERSION="19.1.6"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -225,7 +225,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG TBB_VERSION="v2021.13.0"
+ARG TBB_VERSION="v2022.0.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $TBB_VERSION \
@@ -249,7 +249,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG DPL_VERSION="oneDPL-2022.6.0-rc1"
+ARG DPL_VERSION="oneDPL-2022.7.1-release"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $DPL_VERSION \
@@ -317,7 +317,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.7.2"
+ARG QT_VERSION="v6.8.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $QT_VERSION \
@@ -493,7 +493,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG FMT_VERSION="11.0.2"
+ARG FMT_VERSION="11.1.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FMT_VERSION \
@@ -517,7 +517,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="v1.14.1"
+ARG SPDLOG_VERSION="v1.x"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \
@@ -575,7 +575,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SCOTCH_VERSION="v7.0.5"
+ARG SCOTCH_VERSION="v7.0.6"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SCOTCH_VERSION \
@@ -606,7 +606,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG DUNE_COPASI_VERSION="releases/2.0"
+ARG DUNE_COPASI_VERSION="releases/2.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export DUNE_COPASI_USE_STATIC_DEPS=ON \
     && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \
@@ -701,7 +701,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.7.0"
+ARG CATCH2_VERSION="v3.7.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \
@@ -724,7 +724,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux_2_28_x86_64:2024-09-09-f386546
+FROM quay.io/pypa/manylinux_2_28_x86_64:2025-01-05-75aeda9
 
 LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux_x86_64
 LABEL org.opencontainers.image.description="manylinux x86_64 image for compiling Spatial Model Editor python wheels"

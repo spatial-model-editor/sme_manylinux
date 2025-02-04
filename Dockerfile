@@ -1,5 +1,7 @@
-FROM quay.io/pypa/manylinux_2_28_x86_64:2025-01-05-75aeda9 as builder
+ARG ARCH
+FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.02.02-1 as builder
 
+ARG ARCH
 ARG NPROCS=24
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
@@ -47,16 +49,17 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && rm -rf $TMP_DIR
 
 ARG GMP_VERSION="6.3.0"
+# download url is a temporary workaround for gmp blacklisting github ips
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
-        https://gmplib.org/download/gmp/gmp-${GMP_VERSION}.tar.bz2 \
-        --output gmp.tar.bz2 \
-    && tar xjf gmp.tar.bz2 \
+        https://github.com/spatial-model-editor/spatial-model-editor.github.io/releases/download/1.0.0/gmp-${GMP_VERSION}.tar.xz \
+        --output gmp.tar.xz \
+    && tar xf gmp.tar.xz \
     && cd gmp-${GMP_VERSION} \
     && ./configure \
         --prefix=$BUILD_DIR \
         --disable-shared \
-        --host=x86_64-unknown-linux-gnu \
+        --host=${ARCH}-unknown-linux-gnu \
         --enable-static \
         --with-pic \
         --enable-cxx \
@@ -75,7 +78,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ./configure \
         --prefix=$BUILD_DIR \
         --disable-shared \
-        --host=x86_64-unknown-linux-gnu \
+        --host=${ARCH}-unknown-linux-gnu \
         --enable-static \
         --with-pic \
         --with-gmp-lib=$BUILD_DIR/lib \
@@ -182,7 +185,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="19.1.6"
+ARG LLVM_VERSION="19.1.7"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -196,7 +199,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp312-cp312/bin/python \
-        -DLLVM_DEFAULT_TARGET_TRIPLE=x86_64-unknown-linux-gnu \
+        -DLLVM_DEFAULT_TARGET_TRIPLE=${ARCH}-unknown-linux-gnu \
         -DLLVM_TARGETS_TO_BUILD="X86" \
         -DLLVM_BUILD_TOOLS=OFF \
         -DLLVM_INCLUDE_TOOLS=OFF \
@@ -724,27 +727,31 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux_2_28_x86_64:2025-01-05-75aeda9
+FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.02.02-1
 
-LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux_x86_64
-LABEL org.opencontainers.image.description="manylinux x86_64 image for compiling Spatial Model Editor python wheels"
+LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux
+LABEL org.opencontainers.image.description="manylinux ${ARCH} image for compiling Spatial Model Editor python wheels"
 LABEL org.opencontainers.image.licenses=MIT
 
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
 
+RUN /opt/python/cp312-cp312/bin/pip install ninja \
+    && ln -fs /opt/python/cp312-cp312/bin/ninja /usr/bin/ninja
+
 ARG CCACHE_VERSION="4.10.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl \
-        -L https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}-linux-x86_64.tar.xz \
+        -L https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}.tar.xz \
         --output ccache.tar.xz \
     && tar xJf ccache.tar.xz \
-    && cd ccache-${CCACHE_VERSION}-linux-x86_64 \
-    && make install \
+    && cd ccache-${CCACHE_VERSION} \
+    && mkdir build \
+    && cd build \
+    && cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_DOCUMENTATION=OFF -DHTTP_STORAGE_BACKEND=OFF -DENABLE_TESTING=OFF -DREDIS_STORAGE_BACKEND=OFF -GNinja .. \
+    && ninja \
+    && ninja install \
     && rm -rf $TMP_DIR
-
-RUN /opt/python/cp312-cp312/bin/pip install ninja \
-    && ln -fs /opt/python/cp312-cp312/bin/ninja /usr/bin/ninja
 
 # SME static libs
 COPY --from=builder $BUILD_DIR $BUILD_DIR

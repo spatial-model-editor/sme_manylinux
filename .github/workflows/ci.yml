@@ -1,0 +1,27 @@
+name: CI
+on: push
+
+jobs:
+  manylinux:
+    runs-on: ${{ matrix.platform.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: "ubuntu-22.04"
+            arch: "x86_64"
+          - os: "ubuntu-22.04-arm"
+            arch: "aarch64"
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build . --build-arg="ARCH=${{ matrix.platform.arch }}"
+      - if: github.repository == 'spatial-model-editor/sme_manylinux' && github.event_name == 'push' && (startsWith(github.event.ref, 'refs/tags/'))
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - if: github.repository == 'spatial-model-editor/sme_manylinux' && github.event_name == 'push' && (startsWith(github.event.ref, 'refs/tags/'))
+        run: |
+          docker build . --build-arg="ARCH=${{ matrix.platform.arch }}" -t ghcr.io/spatial-model-editor/manylinux_${{ matrix.platform.arch }}:${{ github.ref_name }}
+          docker push ghcr.io/spatial-model-editor/manylinux_${{ matrix.platform.arch }}:${{ github.ref_name }}

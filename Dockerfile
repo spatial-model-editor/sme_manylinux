@@ -612,7 +612,6 @@ ARG DUNE_COPASI_VERSION="releases/2.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export DUNE_COPASI_USE_STATIC_DEPS=ON \
     && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \
-    && export CMAKE_GENERATOR=Ninja \
     && export CMAKE_CXX_FLAGS='"-fvisibility=hidden -D_GLIBCXX_USE_TBB_PAR_BACKEND=0"' \
     && export CMAKE_DISABLE_FIND_PACKAGE_MPI=ON \
     && export DUNE_ENABLE_PYTHONBINDINGS=OFF \

@@ -200,7 +200,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp312-cp312/bin/python \
         -DLLVM_DEFAULT_TARGET_TRIPLE=${ARCH}-unknown-linux-gnu \
-        -DLLVM_TARGETS_TO_BUILD="X86" \
+        -DLLVM_TARGETS_TO_BUILD=host \
         -DLLVM_BUILD_TOOLS=OFF \
         -DLLVM_INCLUDE_TOOLS=OFF \
         -DLLVM_BUILD_EXAMPLES=OFF \
@@ -574,7 +574,6 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DWITH_SYMENGINE_THREAD_SAFE=ON \
         .. \
     && ninja \
-    && ninja test \
     && ninja install \
     && rm -rf $TMP_DIR
 

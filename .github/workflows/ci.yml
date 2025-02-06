@@ -12,6 +12,11 @@ jobs:
             arch: "x86_64"
           - os: "ubuntu-22.04-arm"
             arch: "aarch64"
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - run: docker build . --build-arg="ARCH=${{ matrix.platform.arch }}"

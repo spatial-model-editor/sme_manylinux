@@ -113,8 +113,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         .. \
     && ninja \
@@ -134,8 +134,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DEXPAT_BUILD_DOCS=OFF \
         -DEXPAT_BUILD_EXAMPLES=OFF \
@@ -163,8 +163,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -Djpeg=OFF \
         -Djpeg12=OFF \
@@ -241,8 +241,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DTBB_ENABLE_IPO=ON \
         -DTBB_STRICT=OFF \
@@ -265,8 +265,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DCMAKE_PREFIX_PATH=$BUILD_DIR \
         -DONEDPL_BACKEND="tbb" \
@@ -288,8 +288,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DPAGMO_BUILD_STATIC_LIBRARY=ON \
         -DPAGMO_BUILD_TESTS=OFF \
@@ -311,8 +311,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
     && ninja zlibstatic \
     && cp libz.a $BUILD_DIR/lib/libz.a \
@@ -335,8 +335,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=${BUILD_DIR} \
         -DFEATURE_system_doubleconversion=OFF \
         -DFEATURE_system_harfbuzz=OFF \
@@ -384,8 +384,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DBUILD_opencv_apps=OFF \
         -DBUILD_opencv_calib3d=OFF \
@@ -509,8 +509,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DCMAKE_CXX_STANDARD=17 \
         -DFMT_DOC=OFF \
@@ -533,8 +533,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DSPDLOG_BUILD_TESTS=ON \
         -DSPDLOG_BUILD_EXAMPLE=OFF \
@@ -561,8 +561,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DBUILD_BENCHMARKS=OFF \
         -DGMP_INCLUDE_DIR=$BUILD_DIR/include \
@@ -590,8 +590,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DBUILD_PTSCOTCH=OFF \
         -DBUILD_LIBESMUMPS=OFF \
@@ -645,8 +645,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DCMAKE_PREFIX_PATH=$BUILD_DIR \
         -DENABLE_SPATIAL=ON \
@@ -687,8 +687,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DCMAKE_PREFIX_PATH="$BUILD_DIR;$BUILD_DIR/lib/cmake" \
         -DLIBCOMBINE_SKIP_SHARED_LIBRARY=ON \
@@ -715,8 +715,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
-        -DCMAKE_C_FLAGS="-fpic -fvisibility=hidden" \
-        -DCMAKE_CXX_FLAGS="-fpic -fvisibility=hidden" \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DCATCH_INSTALL_DOCS=OFF \
         -DCATCH_INSTALL_EXTRAS=ON \

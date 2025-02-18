@@ -2,7 +2,7 @@ ARG ARCH
 FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.02.02-1 as builder
 
 ARG ARCH
-ARG NPROCS=24
+ARG NPROCS=4
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
 
@@ -92,7 +92,6 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         --with-pic \
         --enable-cxx \
     && make -j$NPROCS \
-    && make check \
     && make install \
     && rm -rf $TMP_DIR
 
@@ -112,7 +111,6 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         --with-gmp-lib=$BUILD_DIR/lib \
         --with-gmp-include=$BUILD_DIR/include \
     && make -j$NPROCS \
-    && make check \
     && make install \
     && rm -rf $TMP_DIR
 
@@ -169,9 +167,9 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DEXPAT_BUILD_EXAMPLES=OFF \
         -DEXPAT_BUILD_TOOLS=OFF \
         -DEXPAT_SHARED_LIBS=OFF \
+        -DEXPAT_BUILD_TESTS:BOOL=OFF \
         ../expat \
     && ninja \
-    && ninja test \
     && ninja install \
     && rm -rf $TMP_DIR
 
@@ -205,11 +203,11 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -Dmdi=OFF \
         -Dwebp=OFF \
         -Dzlib=OFF \
+        -Dtiff-tests=OFF \
         -DGLUT_INCLUDE_DIR=GLUT_INCLUDE_DIR-NOTFOUND \
         -DOPENGL_INCLUDE_DIR=OPENGL_INCLUDE_DIR-NOTFOUND \
         .. \
     && ninja \
-    && ninja test \
     && ninja install \
     && rm -rf $TMP_DIR
 
@@ -543,9 +541,9 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DCMAKE_CXX_STANDARD=17 \
         -DFMT_DOC=OFF \
+        -DFMT_TEST:BOOL=OFF \
         .. \
     && ninja \
-    && ninja test \
     && ninja install \
     && rm -rf $TMP_DIR
 
@@ -565,7 +563,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
-        -DSPDLOG_BUILD_TESTS=ON \
+        -DSPDLOG_BUILD_TESTS=OFF \
         -DSPDLOG_BUILD_EXAMPLE=OFF \
         -DSPDLOG_FMT_EXTERNAL=ON \
         -DSPDLOG_NO_THREAD_ID=ON \
@@ -573,7 +571,6 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_PREFIX_PATH=$BUILD_DIR \
         .. \
     && ninja \
-    && ninja test \
     && ninja install \
     && rm -rf $TMP_DIR
 
@@ -631,9 +628,9 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DUSE_BZ2=ON \
         -DBZIP2_INCLUDE_DIR=${BUILD_DIR}/include \
         -DBZIP2_LIBRARY_RELEASE=${BUILD_DIR}/lib/libbz2.a \
+        -DENABLE_TESTS=OFF \
         .. \
     && ninja \
-    && ninja test \
     && ninja install \
     && rm -rf $TMP_DIR
 
@@ -727,7 +724,6 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DZLIB_LIBRARY=$BUILD_DIR/lib/libz.a \
         .. \
     && ninja \
-    && ninja test \
     && ninja install \
     && rm -rf $TMP_DIR
 

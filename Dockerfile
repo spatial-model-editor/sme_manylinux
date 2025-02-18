@@ -13,6 +13,34 @@ RUN yum update -y \
     && yum install -y flex-2.6.1 git-lfs-3.4.1 \
     && yum clean all
 
+ARG NLOPT_VERSION="v2.10.0"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && git clone \
+        -b $NLOPT_VERSION \
+        --depth 1 \
+        https://github.com/stevengj/nlopt.git \
+    && cd nlopt \
+    && mkdir build \
+    && cd build \
+    && cmake \
+        -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
+        -DCMAKE_INSTALL_PREFIX="$BUILD_DIR" \
+        -DNLOPT_FORTRAN=OFF \
+        -DNLOPT_GUILE=OFF \
+        -DNLOPT_JAVA=OFF \
+        -DNLOPT_MATLAB=OFF \
+        -DNLOPT_OCTAVE=OFF \
+        -DNLOPT_PYTHON=OFF \
+        -DNLOPT_SWIG=OFF \
+        .. \
+    && ninja \
+    && ninja install \
+    && rm -rf $TMP_DIR
+
 ARG CEREAL_VERSION="v1.3.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
@@ -293,6 +321,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
         -DPAGMO_BUILD_STATIC_LIBRARY=ON \
         -DPAGMO_BUILD_TESTS=OFF \
+        -DPAGMO_WITH_NLOPT=ON \
         .. \
     && ninja \
     && ninja install \

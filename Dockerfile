@@ -1,5 +1,5 @@
 ARG ARCH
-FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.02.02-1 as builder
+FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.06.17-1 AS builder
 
 ARG ARCH
 ARG NPROCS=4
@@ -114,8 +114,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.87.0"
-ARG BOOST_VERSION_="1_87_0"
+ARG BOOST_VERSION="1.88.0"
+ARG BOOST_VERSION_="1_88_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         "https://archives.boost.io/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
@@ -147,7 +147,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBEXPAT_VERSION="R_2_6_4"
+ARG LIBEXPAT_VERSION="R_2_7_1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBEXPAT_VERSION \
@@ -187,6 +187,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cd cmake-build \
     && cmake \
         -GNinja \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
@@ -211,7 +212,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="19.1.7"
+ARG LLVM_VERSION="20.1.6"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -347,7 +348,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.8.1"
+ARG QT_VERSION="v6.9.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $QT_VERSION \
@@ -387,18 +388,18 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG BZIP2_VERSION="1.0.8"
+ARG BZIP2_VERSION="bzip2-1.0.8"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
-    && curl -L \
-        https://sourceware.org/pub/bzip2/bzip2-${BZIP2_VERSION}.tar.gz \
-        --output bzip2.tar.gz \
-    && tar xf bzip2.tar.gz \
-    && cd bzip2-${BZIP2_VERSION} \
+    && git clone \
+        -b ${BZIP2_VERSION} \
+        --depth=1 \
+        https://gitlab.com/bzip2/bzip2.git \
+    && cd bzip2 \
     && make CFLAGS="-O2 -g -D_FILE_OFFSET_BITS=64 -fPIC" -j$NPROCS \
     && make install PREFIX="$BUILD_DIR" \
     && rm -rf $TMP_DIR
 
-ARG OPENCV_VERSION="4.10.0"
+ARG OPENCV_VERSION="4.11.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $OPENCV_VERSION \
@@ -523,7 +524,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG FMT_VERSION="11.1.1"
+ARG FMT_VERSION="11.2.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FMT_VERSION \
@@ -539,7 +540,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
-        -DCMAKE_CXX_STANDARD=17 \
+        -DCMAKE_CXX_STANDARD=20 \
         -DFMT_DOC=OFF \
         -DFMT_TEST:BOOL=OFF \
         .. \
@@ -547,7 +548,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="v1.x"
+ARG SPDLOG_VERSION="v1.15.3"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \
@@ -585,6 +586,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cd build \
     && cmake \
         -GNinja \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_SHARED_LIBS=OFF \
         -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
@@ -603,7 +605,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SCOTCH_VERSION="v7.0.6"
+ARG SCOTCH_VERSION="v7.0.7"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SCOTCH_VERSION \
@@ -658,7 +660,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && bash .ci/test "$PWD"/dune-copasi.opts \
     && rm -rf $TMP_DIR
 
-ARG LIBSBML_VERSION="v5.20.4"
+ARG LIBSBML_VERSION="v5.20.5"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBSBML_VERSION \
@@ -727,7 +729,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.7.1"
+ARG CATCH2_VERSION="v3.8.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \
@@ -750,7 +752,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.02.02-1
+FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.06.17-1
 
 LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux
 LABEL org.opencontainers.image.description="manylinux ${ARCH} image for compiling Spatial Model Editor python wheels"

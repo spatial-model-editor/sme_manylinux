@@ -706,7 +706,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         --depth=1 \
         https://github.com/sbmlteam/libCombine.git \
     && cd libCombine \
-    && git submodule update --init submodules/zipper \
+    && git submodule update --init --recursive submodules/zipper \
     && cd submodules/zipper \
     && git checkout $ZIPPER_VERSION \
     && cd ../../ \

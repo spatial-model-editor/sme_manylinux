@@ -612,6 +612,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         --depth=1 \
         https://gitlab.inria.fr/scotch/scotch.git \
     && cd scotch \
+    && sed -i '/execute_process(COMMAND ${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS} -E -Og -dM -x c ${dev_null}/i\  separate_arguments(C_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")' src/CMakeLists.txt && sed -i 's/${CMAKE_C_FLAGS}/${C_FLAGS_LIST}/' src/CMakeLists.txt \
     && mkdir build \
     && cd build \
     && cmake \

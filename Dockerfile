@@ -1,13 +1,13 @@
 ARG ARCH
-FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.06.17-1 AS builder
+FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.10.05-1 AS builder
 
 ARG ARCH
 ARG NPROCS=4
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
 
-RUN /opt/python/cp312-cp312/bin/pip install ninja \
-    && ln -fs /opt/python/cp312-cp312/bin/ninja /usr/bin/ninja
+RUN /opt/python/cp313-cp313/bin/pip install ninja \
+    && ln -fs /opt/python/cp313-cp313/bin/ninja /usr/bin/ninja
 
 RUN yum update -y \
     && yum install -y flex-2.6.1 git-lfs-3.4.1 \
@@ -58,7 +58,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG FUNCTION2_VERSION="4.2.4"
+ARG FUNCTION2_VERSION="4.2.5"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FUNCTION2_VERSION \
@@ -114,8 +114,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.88.0"
-ARG BOOST_VERSION_="1_88_0"
+ARG BOOST_VERSION="1.89.0"
+ARG BOOST_VERSION_="1_89_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         "https://archives.boost.io/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
@@ -126,7 +126,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ./b2 link=static install \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v6.0.1"
+ARG CGAL_VERSION="v6.0.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -147,7 +147,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBEXPAT_VERSION="R_2_7_1"
+ARG LIBEXPAT_VERSION="R_2_7_3"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBEXPAT_VERSION \
@@ -173,7 +173,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBTIFF_VERSION="v4.7.0"
+ARG LIBTIFF_VERSION="v4.7.1"
 # includes patch for cmake linking CMath issue from sme_deps_common
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
@@ -212,7 +212,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="20.1.6"
+ARG LLVM_VERSION="21.1.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -225,7 +225,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -GNinja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
-        -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp312-cp312/bin/python \
+        -DPython3_EXECUTABLE:FILEPATH=/opt/python/cp313-cp313/bin/python \
         -DLLVM_DEFAULT_TARGET_TRIPLE=${ARCH}-unknown-linux-gnu \
         -DLLVM_TARGETS_TO_BUILD=host \
         -DLLVM_BUILD_TOOLS=OFF \
@@ -255,7 +255,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG TBB_VERSION="v2022.0.0"
+ARG TBB_VERSION="v2022.2.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $TBB_VERSION \
@@ -279,7 +279,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG DPL_VERSION="oneDPL-2022.7.1-release"
+ARG DPL_VERSION="oneDPL-2022.9.0-release"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $DPL_VERSION \
@@ -348,7 +348,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.9.1"
+ARG QT_VERSION="v6.9.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $QT_VERSION \
@@ -399,7 +399,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install PREFIX="$BUILD_DIR" \
     && rm -rf $TMP_DIR
 
-ARG OPENCV_VERSION="4.11.0"
+ARG OPENCV_VERSION="4.12.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $OPENCV_VERSION \
@@ -524,7 +524,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG FMT_VERSION="11.2.0"
+ARG FMT_VERSION="12.0.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FMT_VERSION \
@@ -605,14 +605,13 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SCOTCH_VERSION="v7.0.7"
+ARG SCOTCH_VERSION="v7.0.9"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SCOTCH_VERSION \
         --depth=1 \
         https://gitlab.inria.fr/scotch/scotch.git \
     && cd scotch \
-    && sed -i '/execute_process(COMMAND ${CMAKE_C_COMPILER} ${CMAKE_C_FLAGS} -E -Og -dM -x c ${dev_null}/i\  separate_arguments(C_FLAGS_LIST UNIX_COMMAND "${CMAKE_C_FLAGS}")' src/CMakeLists.txt && sed -i 's/${CMAKE_C_FLAGS}/${C_FLAGS_LIST}/' src/CMakeLists.txt \
     && mkdir build \
     && cd build \
     && cmake \
@@ -637,7 +636,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG DUNE_COPASI_VERSION="releases/2.1"
+ARG DUNE_COPASI_VERSION="master"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export DUNE_COPASI_USE_STATIC_DEPS=ON \
     && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \
@@ -730,7 +729,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.8.1"
+ARG CATCH2_VERSION="v3.10.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \
@@ -753,7 +752,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.06.17-1
+FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.10.05-1
 
 LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux
 LABEL org.opencontainers.image.description="manylinux ${ARCH} image for compiling Spatial Model Editor python wheels"
@@ -762,10 +761,10 @@ LABEL org.opencontainers.image.licenses=MIT
 ARG BUILD_DIR=/opt/smelibs
 ARG TMP_DIR=/opt/tmpwd
 
-RUN /opt/python/cp312-cp312/bin/pip install ninja \
-    && ln -fs /opt/python/cp312-cp312/bin/ninja /usr/bin/ninja
+RUN /opt/python/cp313-cp313/bin/pip install ninja \
+    && ln -fs /opt/python/cp313-cp313/bin/ninja /usr/bin/ninja
 
-ARG CCACHE_VERSION="4.10.2"
+ARG CCACHE_VERSION="4.12.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl \
         -L https://github.com/ccache/ccache/releases/download/v${CCACHE_VERSION}/ccache-${CCACHE_VERSION}.tar.xz \

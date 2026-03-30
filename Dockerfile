@@ -1,5 +1,5 @@
 ARG ARCH
-FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.10.05-1 AS builder
+FROM quay.io/pypa/manylinux_2_28_${ARCH}:2026.03.27-1 AS builder
 
 ARG ARCH
 ARG NPROCS=4
@@ -212,7 +212,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="21.1.2"
+ARG LLVM_VERSION="22.1.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -253,6 +253,48 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         .. \
     && ninja \
     && ninja install \
+    && rm -rf $TMP_DIR
+
+ARG CUDA_REDIST_VERSION="13.2.51"
+RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
+    && case "$ARCH" in \
+        x86_64) \
+            cuda_platform="linux-x86_64"; \
+            cuda_target_dir="$BUILD_DIR/cuda/targets/x86_64-linux" \
+            ;; \
+        aarch64) \
+            cuda_platform="linux-sbsa"; \
+            cuda_target_dir="$BUILD_DIR/cuda/targets/sbsa-linux" \
+            ;; \
+        *) \
+            echo "Unsupported CUDA arch: $ARCH" >&2; \
+            exit 1 \
+            ;; \
+    esac \
+    && rm -rf "$BUILD_DIR/cuda" \
+    && mkdir -p "$cuda_target_dir" \
+    && printf '{\n  "cuda": {\n    "name": "CUDA Toolkit",\n    "version": "%s"\n  }\n}\n' "$CUDA_REDIST_VERSION" > "$BUILD_DIR/cuda/version.json" \
+    && for component in cuda_cudart cuda_crt cuda_nvrtc libnvptxcompiler; do \
+        archive="${component}-${cuda_platform}-${CUDA_REDIST_VERSION}-archive.tar.xz"; \
+        curl -L "https://developer.download.nvidia.com/compute/cuda/redist/${component}/${cuda_platform}/${archive}" --output "$archive"; \
+        tar -xf "$archive"; \
+    done \
+    && for component in cuda_cudart cuda_crt cuda_nvrtc libnvptxcompiler; do \
+        archive_dir="${component}-${cuda_platform}-${CUDA_REDIST_VERSION}-archive"; \
+        if [ -d "${archive_dir}/include" ]; then \
+            mkdir -p "$cuda_target_dir/include"; \
+            cp -a "${archive_dir}/include/." "$cuda_target_dir/include/"; \
+        fi; \
+        if [ -d "${archive_dir}/lib" ]; then \
+            mkdir -p "$cuda_target_dir/lib"; \
+            cp -a "${archive_dir}/lib/." "$cuda_target_dir/lib/"; \
+        fi; \
+    done \
+    && find "$cuda_target_dir" -type f -name '*_static.a' \
+        -exec objcopy \
+            --rename-section .ctors=.init_array \
+            --rename-section .dtors=.fini_array \
+            '{}' ';' \
     && rm -rf $TMP_DIR
 
 ARG TBB_VERSION="v2022.2.0"
@@ -348,7 +390,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.9.2"
+ARG QT_VERSION="v6.10.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $QT_VERSION \
@@ -575,12 +617,12 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SYMENGINE_VERSION="master"
+ARG SYMENGINE_VERSION="add_cudacode_printer"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SYMENGINE_VERSION \
         --depth=1 \
-        https://github.com/symengine/symengine.git \
+        https://github.com/lkeegan/symengine.git \
     && cd symengine \
     && mkdir build \
     && cd build \
@@ -600,6 +642,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DWITH_COTIRE=OFF \
         -DWITH_SYSTEM_CEREAL=ON \
         -DWITH_SYMENGINE_THREAD_SAFE=ON \
+        -DBUILD_TESTS=OFF \
         .. \
     && ninja \
     && ninja install \
@@ -636,7 +679,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG DUNE_COPASI_VERSION="master"
+ARG DUNE_COPASI_VERSION="msvc"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && export DUNE_COPASI_USE_STATIC_DEPS=ON \
     && export CMAKE_INSTALL_PREFIX=$BUILD_DIR \
@@ -752,7 +795,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-FROM quay.io/pypa/manylinux_2_28_${ARCH}:2025.10.05-1
+FROM quay.io/pypa/manylinux_2_28_${ARCH}:2026.03.27-1
 
 LABEL org.opencontainers.image.source=https://github.com/spatial-model-editor/sme_manylinux
 LABEL org.opencontainers.image.description="manylinux ${ARCH} image for compiling Spatial Model Editor python wheels"

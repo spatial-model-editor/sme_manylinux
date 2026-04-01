@@ -426,6 +426,9 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DFEATURE_testlib=ON \
         -DBUILD_WITH_PCH=OFF \
         -DFEATURE_xcb=OFF \
+        -DFEATURE_opengl=OFF \
+        -DFEATURE_egl=OFF \
+        -DFEATURE_eglfs=OFF \
     && ninja \
     && ninja install \
     && rm -rf $TMP_DIR

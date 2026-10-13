@@ -13,7 +13,7 @@ RUN yum update -y \
     && yum install -y flex-2.6.1 git-lfs-3.4.1 \
     && yum clean all
 
-ARG NLOPT_VERSION="v2.10.0"
+ARG NLOPT_VERSION="v2.11.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $NLOPT_VERSION \
@@ -95,7 +95,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG MPFR_VERSION="4.2.1"
+ARG MPFR_VERSION="4.2.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl \
         https://www.mpfr.org/mpfr-${MPFR_VERSION}/mpfr-${MPFR_VERSION}.tar.bz2 \
@@ -114,8 +114,8 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install \
     && rm -rf $TMP_DIR
 
-ARG BOOST_VERSION="1.89.0"
-ARG BOOST_VERSION_="1_89_0"
+ARG BOOST_VERSION="1.92.0"
+ARG BOOST_VERSION_="1_92_0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && curl -L \
         "https://archives.boost.io/release/${BOOST_VERSION}/source/boost_${BOOST_VERSION_}.tar.bz2" \
@@ -126,7 +126,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ./b2 link=static install \
     && rm -rf $TMP_DIR
 
-ARG CGAL_VERSION="v6.0.2"
+ARG CGAL_VERSION="v6.2.1"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CGAL_VERSION \
@@ -147,7 +147,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBEXPAT_VERSION="R_2_7_3"
+ARG LIBEXPAT_VERSION="R_2_8_5"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBEXPAT_VERSION \
@@ -173,16 +173,13 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LIBTIFF_VERSION="v4.7.1"
-# includes patch for cmake linking CMath issue from sme_deps_common
+ARG LIBTIFF_VERSION="v4.7.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBTIFF_VERSION \
         --depth=1 \
         https://gitlab.com/libtiff/libtiff.git \
     && cd libtiff \
-    && curl -L https://raw.githubusercontent.com/spatial-model-editor/sme_deps_common/refs/heads/main/libtiff.diff --output patch.diff \
-    && git apply --ignore-space-change --ignore-whitespace --verbose patch.diff \
     && mkdir cmake-build \
     && cd cmake-build \
     && cmake \
@@ -212,7 +209,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG LLVM_VERSION="22.1.2"
+ARG LLVM_VERSION="23.1.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b llvmorg-$LLVM_VERSION \
@@ -255,7 +252,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CUDA_REDIST_VERSION="13.2.51"
+ARG CUDA_REDIST_VERSION="13.4.92"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && case "$ARCH" in \
         x86_64) \
@@ -297,12 +294,12 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
             '{}' ';' \
     && rm -rf $TMP_DIR
 
-ARG TBB_VERSION="v2022.2.0"
+ARG TBB_VERSION="v2023.1.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $TBB_VERSION \
         --depth=1 \
-        https://github.com/oneapi-src/oneTBB.git \
+        https://github.com/uxlfoundation/oneTBB.git \
     && cd oneTBB \
     && mkdir cmake-build \
     && cd cmake-build \
@@ -321,12 +318,12 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG DPL_VERSION="oneDPL-2022.9.0-release"
+ARG DPL_VERSION="oneDPL-release-2022.13.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $DPL_VERSION \
         --depth 1 \
-        https://github.com/oneapi-src/oneDPL.git \
+        https://github.com/uxlfoundation/oneDPL.git \
     && cd oneDPL \
     && mkdir cmake-build \
     && cd cmake-build \
@@ -344,7 +341,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG PAGMO_VERSION="v2.19.1"
+ARG PAGMO_VERSION="v2.20.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $PAGMO_VERSION \
@@ -368,7 +365,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG ZLIB_VERSION="v1.3.1"
+ARG ZLIB_VERSION="v1.3.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $ZLIB_VERSION \
@@ -385,12 +382,12 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
     && ninja zlibstatic \
-    && cp libz.a $BUILD_DIR/lib/libz.a \
+    && cp libz*.a $BUILD_DIR/lib/libz.a \
     && cp zconf.h $BUILD_DIR/include/. \
     && cp ../zlib.h $BUILD_DIR/include/. \
     && rm -rf $TMP_DIR
 
-ARG QT_VERSION="v6.10.2"
+ARG QT_VERSION="v6.12.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $QT_VERSION \
@@ -444,7 +441,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && make install PREFIX="$BUILD_DIR" \
     && rm -rf $TMP_DIR
 
-ARG OPENCV_VERSION="4.12.0"
+ARG OPENCV_VERSION="5.0.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $OPENCV_VERSION \
@@ -460,108 +457,28 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DCMAKE_C_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_CXX_FLAGS="-fPIC -fvisibility=hidden" \
         -DCMAKE_INSTALL_PREFIX=$BUILD_DIR \
+        -DBUILD_LIST=core,imgproc \
         -DBUILD_opencv_apps=OFF \
-        -DBUILD_opencv_calib3d=OFF \
-        -DBUILD_opencv_core=ON \
-        -DBUILD_opencv_dnn=OFF \
-        -DBUILD_opencv_features2d=OFF \
-        -DBUILD_opencv_flann=OFF \
-        -DBUILD_opencv_gapi=OFF \
-        -DBUILD_opencv_highgui=OFF \
-        -DBUILD_opencv_imgcodecs=OFF \
-        -DBUILD_opencv_imgproc=ON \
-        -DBUILD_opencv_java_bindings_generator=OFF \
-        -DBUILD_opencv_js=OFF \
-        -DBUILD_opencv_ml=OFF \
-        -DBUILD_opencv_objdetect=OFF \
-        -DBUILD_opencv_photo=OFF \
-        -DBUILD_opencv_python_bindings_generator=OFF \
-        -DBUILD_opencv_python_tests=OFF \
-        -DBUILD_opencv_stitching=OFF \
-        -DBUILD_opencv_ts=OFF \
-        -DBUILD_opencv_video=OFF \
-        -DBUILD_opencv_videoio=OFF \
-        -DBUILD_opencv_world=OFF \
-        -DBUILD_CUDA_STUBS:BOOL=OFF \
-        -DBUILD_DOCS:BOOL=OFF \
-        -DBUILD_EXAMPLES:BOOL=OFF \
-        -DBUILD_FAT_JAVA_LIB:BOOL=OFF \
-        -DBUILD_IPP_IW:BOOL=OFF \
-        -DBUILD_ITT:BOOL=OFF \
-        -DBUILD_JASPER:BOOL=OFF \
-        -DBUILD_JAVA:BOOL=OFF \
-        -DBUILD_JPEG:BOOL=OFF \
-        -DBUILD_OPENEXR:BOOL=OFF \
-        -DBUILD_PACKAGE:BOOL=OFF \
-        -DBUILD_PERF_TESTS:BOOL=OFF \
-        -DBUILD_PNG:BOOL=OFF \
-        -DBUILD_PROTOBUF:BOOL=OFF \
-        -DBUILD_SHARED_LIBS:BOOL=OFF \
-        -DBUILD_TBB:BOOL=OFF \
-        -DBUILD_TESTS:BOOL=OFF \
-        -DBUILD_TIFF:BOOL=OFF \
-        -DBUILD_USE_SYMLINKS:BOOL=OFF \
-        -DBUILD_WEBP:BOOL=OFF \
-        -DBUILD_WITH_DEBUG_INFO:BOOL=OFF \
-        -DBUILD_WITH_DYNAMIC_IPP:BOOL=OFF \
-        -DBUILD_ZLIB:BOOL=OFF \
-        -DWITH_1394:BOOL=OFF \
-        -DWITH_ADE:BOOL=OFF \
-        -DWITH_ARAVIS:BOOL=OFF \
-        -DWITH_CLP:BOOL=OFF \
-        -DWITH_CUDA:BOOL=OFF \
-        -DWITH_EIGEN:BOOL=OFF \
-        -DWITH_FFMPEG:BOOL=OFF \
-        -DWITH_FREETYPE:BOOL=OFF \
-        -DWITH_GDAL:BOOL=OFF \
-        -DWITH_GDCM:BOOL=OFF \
-        -DWITH_GPHOTO2:BOOL=OFF \
-        -DWITH_GSTREAMER:BOOL=OFF \
-        -DWITH_GTK:BOOL=OFF \
-        -DWITH_GTK_2_X:BOOL=OFF \
-        -DWITH_HALIDE:BOOL=OFF \
-        -DWITH_HPX:BOOL=OFF \
-        -DWITH_IMGCODEC_HDR:BOOL=OFF \
-        -DWITH_IMGCODEC_PFM:BOOL=OFF \
-        -DWITH_IMGCODEC_PXM:BOOL=OFF \
-        -DWITH_IMGCODEC_SUNRASTER:BOOL=OFF \
-        -DWITH_INF_ENGINE:BOOL=OFF \
-        -DWITH_IPP:BOOL=OFF \
-        -DWITH_ITT:BOOL=OFF \
-        -DWITH_JASPER:BOOL=OFF \
-        -DWITH_JPEG:BOOL=OFF \
-        -DWITH_LAPACK:BOOL=OFF \
-        -DWITH_LIBREALSENSE:BOOL=OFF \
-        -DWITH_MFX:BOOL=OFF \
-        -DWITH_NGRAPH:BOOL=OFF \
-        -DWITH_OPENCL:BOOL=OFF \
-        -DWITH_OPENCLAMDBLAS:BOOL=OFF \
-        -DWITH_OPENCLAMDFFT:BOOL=OFF \
-        -DWITH_OPENCL_SVM:BOOL=OFF \
-        -DWITH_OPENEXR:BOOL=OFF \
-        -DWITH_OPENGL:BOOL=OFF \
-        -DWITH_OPENJPEG:BOOL=OFF \
-        -DWITH_OPENMP:BOOL=OFF \
-        -DWITH_OPENNI:BOOL=OFF \
-        -DWITH_OPENNI2:BOOL=OFF \
-        -DWITH_OPENVX:BOOL=OFF \
-        -DWITH_PLAIDML:BOOL=OFF \
-        -DWITH_PNG:BOOL=OFF \
-        -DWITH_PROTOBUF:BOOL=OFF \
-        -DWITH_PTHREADS_PF:BOOL=OFF \
-        -DWITH_PVAPI:BOOL=OFF \
-        -DWITH_QT:BOOL=OFF \
-        -DWITH_QUIRC:BOOL=OFF \
-        -DWITH_TBB:BOOL=OFF \
-        -DWITH_TIFF:BOOL=OFF \
-        -DWITH_V4L:BOOL=OFF \
-        -DWITH_VA:BOOL=OFF \
-        -DWITH_VA_INTEL:BOOL=OFF \
-        -DWITH_VTK:BOOL=OFF \
-        -DWITH_VULKAN:BOOL=OFF \
-        -DWITH_WEBP:BOOL=OFF \
-        -DWITH_XIMEA:BOOL=OFF \
-        -DWITH_XINE:BOOL=OFF \
+        -DBUILD_TESTS=OFF \
+        -DBUILD_PERF_TESTS=OFF \
+        -DBUILD_ZLIB=OFF \
+        -DWITH_EIGEN=OFF \
+        -DWITH_IPP=OFF \
+        -DWITH_ITT=OFF \
+        -DWITH_KLEIDICV=OFF \
+        -DWITH_LAPACK=OFF \
+        -DWITH_OPENCL=OFF \
+        -DWITH_PTHREADS_PF=OFF \
+        -DWITH_VA=OFF \
+        -DWITH_VA_INTEL=OFF \
+        -DWITH_JASPER=OFF \
+        -DWITH_JPEG=OFF \
+        -DWITH_OPENEXR=OFF \
+        -DWITH_OPENJPEG=OFF \
+        -DWITH_PNG=OFF \
+        -DWITH_PROTOBUF=OFF \
+        -DWITH_TIFF=OFF \
+        -DWITH_WEBP=OFF \
         -DZLIB_INCLUDE_DIR=$BUILD_DIR/include \
         -DZLIB_LIBRARY_RELEASE=$BUILD_DIR/lib/libz.a \
         .. \
@@ -569,7 +486,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG FMT_VERSION="12.0.0"
+ARG FMT_VERSION="12.2.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $FMT_VERSION \
@@ -593,7 +510,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SPDLOG_VERSION="v1.15.3"
+ARG SPDLOG_VERSION="v1.17.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SPDLOG_VERSION \
@@ -620,12 +537,12 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SYMENGINE_VERSION="add_metalcode_printer"
+ARG SYMENGINE_VERSION="v0.15.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SYMENGINE_VERSION \
         --depth=1 \
-        https://github.com/lkeegan/symengine.git \
+        https://github.com/symengine/symengine.git \
     && cd symengine \
     && mkdir build \
     && cd build \
@@ -651,7 +568,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG SCOTCH_VERSION="v7.0.9"
+ARG SCOTCH_VERSION="v7.0.16"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $SCOTCH_VERSION \
@@ -706,7 +623,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && bash .ci/test "$PWD"/dune-copasi.opts \
     && rm -rf $TMP_DIR
 
-ARG LIBSBML_VERSION="v5.20.5"
+ARG LIBSBML_VERSION="v5.21.2"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $LIBSBML_VERSION \
@@ -775,7 +692,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && ninja install \
     && rm -rf $TMP_DIR
 
-ARG CATCH2_VERSION="v3.10.0"
+ARG CATCH2_VERSION="v3.16.0"
 RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
     && git clone \
         -b $CATCH2_VERSION \

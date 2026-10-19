@@ -420,6 +420,7 @@ RUN mkdir -p $TMP_DIR && cd $TMP_DIR \
         -DFEATURE_openssl=OFF \
         -DFEATURE_sql=OFF \
         -DFEATURE_icu=OFF \
+        -DFEATURE_glib=OFF \
         -DFEATURE_testlib=ON \
         -DBUILD_WITH_PCH=OFF \
         -DFEATURE_xcb=OFF \
